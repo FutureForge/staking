@@ -1,5 +1,7 @@
-import { getContract } from "@/modules/blockchain";
+import { getContract, getContractCustom } from "@/modules/blockchain";
 import { readContract } from "thirdweb";
+import { chain1, client } from "@/utils/configs";
+import TokenContract from "@/modules/blockchain/abi/token.json";
 
 const stakingContract = getContract({ type: "staking" });
 
@@ -172,6 +174,24 @@ export async function getERC20TokenAddress(): Promise<string> {
     params: [],
   });
   return tokenAddress as string;
+}
+
+export async function getERC20TokenBalance(address: string): Promise<number> {
+  const tokenAddress = await getERC20TokenAddress();
+  
+  const tokenContract = getContractCustom({
+    contractAddress: tokenAddress,
+    chain: chain1,
+    abi: TokenContract,
+  });
+  
+  const balance = await readContract({
+    contract: tokenContract,
+    method: "function balanceOf(address) view returns (uint256)",
+    params: [address],
+  });
+  
+  return Number(balance);
 }
 
 export async function getStakingTokenAddress(): Promise<string> {

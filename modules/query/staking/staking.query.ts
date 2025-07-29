@@ -22,6 +22,7 @@ import {
   getUserInfoERC20,
   getUserInfoNative,
   getERC20TokenAddress,
+  getERC20TokenBalance,
   getStakingTokenAddress,
   getNativeStakingTokenAddress,
   getEpochInfo,
@@ -239,6 +240,19 @@ export function usePendingRewards(address?: string) {
         erc20Rewards: erc20Rewards || 0,
         nativeRewards: nativeRewards || 0,
       };
+    },
+    enabled: !!address,
+    refetchInterval: 10000, // refetch every 10 seconds
+  });
+}
+
+// Get ERC20 token balance for a user
+export function useERC20TokenBalance(address?: string) {
+  return useQuery({
+    queryKey: queryKeys.staking.erc20TokenBalance(address),
+    queryFn: async (): Promise<number> => {
+      if (!address) return 0;
+      return await getERC20TokenBalance(address);
     },
     enabled: !!address,
     refetchInterval: 10000, // refetch every 10 seconds
