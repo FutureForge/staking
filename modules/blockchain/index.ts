@@ -38,7 +38,7 @@ export function getChainInfoById(chainId: number) {
   throw new Error(`Unsupported chain: ${chainEntry.chain}`);
 }
 
-export function getContract(type: "staking" | "staking-token") {
+export function getContract({ type }: { type: "staking" | "staking-token" }) {
   const contractAddress =
     type === "staking"
       ? chain1StakingContract

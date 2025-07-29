@@ -62,12 +62,14 @@ export const chain1Mainnet = defineChain({
 });
 
 export const chain1TestnetStakingContract =
-  "0x1610D4E1F3e6f7A487cf27dc59c5694bbd74d951";
+  "0xd356a808c3d51b0fae89e310921e81e874a59ef0";
 export const chain1MainnetStakingContract = "";
 
 export const chain1TestnetStakingTokenContract =
-  "0x1610D4E1F3e6f7A487cf27dc59c5694bbd74d951";
+  "0x86A6c0763f7F32500e5Dc10bFaa78Cc3300F8831";
 export const chain1MainnetStakingTokenContract = "";
+
+export const chain1USDTContract = "0x85c197De0dA144ABd8F46842734Ff770c5E9B911";
 
 // export const chain2TestnetBetContract =
 //   "0x08B38ef85FEBd41F7c05B5dbB6C02CAEc7650E9B";

@@ -19,43 +19,50 @@ export function QueryProvider({ children }: QueryProviderProps) {
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
           onMutate: () => {
-            toast.loading("Transaction In Process...", { duration: 30000 });
+            // toast.loading("Transaction In Process...", { duration: 30000 });
+            console.log("query provider onMutate called");
           },
           onSuccess: (_data, _variables, _context, mutation) => {
-            // console.log('query provider success', _data, _variables, _context, mutation)
-
-            const successMessage = mutation?.meta?.successMessage as {
-              title?: string;
-              description: string;
-            };
-
-            toast.success(
-              successMessage
-                ? successMessage.description
-                : "Transaction was Successful",
-              {
-                duration: 5000,
-              }
+            console.log(
+              "query provider success",
+              _data,
+              _variables,
+              _context,
+              mutation
             );
+
+            // const successMessage = mutation?.meta?.successMessage as {
+            //   title?: string;
+            //   description: string;
+            // };
+
+            // toast.success(
+            //   successMessage
+            //     ? successMessage.description
+            //     : "Transaction was Successful",
+            //   {
+            //     duration: 5000,
+            //   }
+            // );
           },
           onError: (error, _variables, _context, mutation) => {
-            // console.log('query provider error: ', error)
+            console.log("query provider error: ", error);
 
-            const errorMessage = mutation?.meta?.errorMessage as {
-              title?: string;
-              description: string;
-            };
+            // const errorMessage = mutation?.meta?.errorMessage as {
+            //   title?: string;
+            //   description: string;
+            // };
 
-            // console.log({ errorMessage, error })
+            // // console.log({ errorMessage, error })
 
-            toast.error(
-              errorMessage
-                ? `${errorMessage.description} ${error.message}`
-                : error.message,
-              {
-                duration: 5000,
-              }
-            );
+            // toast.error(
+            //   errorMessage
+            //     ? `${errorMessage.description} ${error.message}`
+            //     : error.message,
+            //   {
+            //     duration: 5000,
+            //   }
+            // );
           },
         }),
       })

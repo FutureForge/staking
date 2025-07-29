@@ -1,3 +1,8 @@
+export * from './stake/stake.mutation'
+export * from './unstake/unstake.mutation'
+export * from './claim/claim-erc20-rewards.mutation'
+export * from './claim/claim-native-rewards.mutation'
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // syntax
 export function useMutationExample() {
