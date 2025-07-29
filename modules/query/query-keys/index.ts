@@ -20,6 +20,7 @@ export const queryKeys = {
     totalNativeStaked: ["staking", "totalNativeStaked"] as const,
     totalWeight: ["staking", "totalWeight"] as const,
     totalNativeWeight: ["staking", "totalNativeWeight"] as const,
+    contractState: ["staking", "contractState"] as const,
     
     // Position details
     position: (id: number) => ["staking", "position", id] as const,
@@ -28,5 +29,12 @@ export const queryKeys = {
     // Contract parameters
     fees: ["staking", "fees"] as const,
     epochInfo: ["staking", "epochInfo"] as const,
+    
+    // Token info
+    erc20TokenInfo: ["staking", "erc20TokenInfo"] as const,
+    stakingTokenInfo: ["staking", "stakingTokenInfo"] as const,
+    
+    // Statistics
+    stats: ["staking", "stats"] as const,
   },
 };

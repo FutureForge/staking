@@ -40,6 +40,7 @@ export function useStakeMutation() {
       stakeType: "native" | "erc20";
       amount: number;
       duration:
+        | "dynamic"
         | "15days"
         | "30days"
         | "60days"
