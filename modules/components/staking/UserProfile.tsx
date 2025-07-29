@@ -30,10 +30,10 @@ export function UserProfile() {
 
   if (!userAddress) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Wallet</h2>
+          <div className="text-6xl mb-4 drop-shadow-lg">🔒</div>
+          <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-sm">Connect Wallet</h2>
           <p className="text-purple-200">
             Connect your wallet to view your staking profile and positions
           </p>
@@ -45,16 +45,16 @@ export function UserProfile() {
   return (
     <div className="space-y-6">
       {/* User Header */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
         <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-lg drop-shadow-sm">
               {userAddress.slice(2, 4).toUpperCase()}
             </span>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">Your Profile</h2>
-            <p className="text-purple-200 text-sm font-mono">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-bold text-white drop-shadow-sm">Your Profile</h2>
+            <p className="text-purple-200 text-sm font-mono truncate">
               {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
             </p>
           </div>
@@ -62,15 +62,15 @@ export function UserProfile() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
             <p className="text-purple-200 text-sm">Total Positions</p>
-            <p className="text-white font-bold text-lg">
+            <p className="text-white font-bold text-lg drop-shadow-sm">
               {(erc20Positions?.length || 0) + (nativePositions?.length || 0)}
             </p>
           </div>
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
             <p className="text-purple-200 text-sm">Total Weight</p>
-            <p className="text-white font-bold text-lg">
+            <p className="text-white font-bold text-lg drop-shadow-sm">
               {formatNumber((userInfoERC20?.weight || 0) + (userInfoNative?.weight || 0))}
             </p>
           </div>
@@ -78,10 +78,10 @@ export function UserProfile() {
       </div>
 
       {/* Pending Rewards */}
-      <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-2xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
         <div className="flex items-center space-x-3 mb-4">
-          <span className="text-2xl">🎁</span>
-          <h3 className="text-lg font-semibold">Pending Rewards</h3>
+          <span className="text-2xl drop-shadow-lg">🎁</span>
+          <h3 className="text-lg font-semibold drop-shadow-sm">Pending Rewards</h3>
         </div>
         
         {isRewardsLoading ? (
@@ -93,20 +93,20 @@ export function UserProfile() {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-green-100">ERC20 Rewards</span>
-              <span className="font-bold text-lg">
+              <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards ? formatTokenAmount(pendingRewards.erc20Rewards) : "0"} XFI
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-green-100">Native Rewards</span>
-              <span className="font-bold text-lg">
+              <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards ? formatTokenAmount(pendingRewards.nativeRewards) : "0"} XFI
               </span>
             </div>
             <div className="border-t border-green-400/30 pt-3 mt-3">
               <div className="flex justify-between items-center">
                 <span className="text-green-100 font-semibold">Total</span>
-                <span className="font-bold text-xl">
+                <span className="font-bold text-xl drop-shadow-sm">
                   {pendingRewards ? formatTokenAmount(pendingRewards.erc20Rewards + pendingRewards.nativeRewards) : "0"} XFI
                 </span>
               </div>
@@ -116,15 +116,15 @@ export function UserProfile() {
       </div>
 
       {/* Position Summary */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Position Summary</h3>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+        <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Position Summary</h3>
         
         <div className="space-y-4">
           {/* ERC20 Positions */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+            <div className="flex justify-between items-center mb-2">
               <span className="text-purple-200 font-medium">ERC20 Positions</span>
-              <span className="text-white font-bold">
+              <span className="text-white font-bold drop-shadow-sm">
                 {erc20Positions?.length || 0}
               </span>
             </div>
@@ -143,10 +143,10 @@ export function UserProfile() {
           </div>
 
           {/* Native Positions */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+            <div className="flex justify-between items-center mb-2">
               <span className="text-purple-200 font-medium">Native Positions</span>
-              <span className="text-white font-bold">
+              <span className="text-white font-bold drop-shadow-sm">
                 {nativePositions?.length || 0}
               </span>
             </div>
@@ -167,28 +167,28 @@ export function UserProfile() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+        <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Quick Actions</h3>
         
         <div className="space-y-3">
-          <button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+          <button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
             Stake ERC20 Tokens
           </button>
-          <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+          <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
             Stake Native Tokens
           </button>
-          <button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+          <button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
             Claim All Rewards
           </button>
         </div>
       </div>
 
       {/* Network Status */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-white font-medium">Network Status</span>
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+            <span className="text-white font-medium drop-shadow-sm">Network Status</span>
           </div>
           <span className="text-green-400 text-sm font-medium">Connected</span>
         </div>

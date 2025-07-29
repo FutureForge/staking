@@ -14,7 +14,7 @@ const geistMono = localFont({
 
 export default function Home() {
   return (
-    <div className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+    <div className={`${geistSans.variable} ${geistMono.variable} font-sans dark min-h-screen bg-black`}>
       <StakingDashboard />
     </div>
   );

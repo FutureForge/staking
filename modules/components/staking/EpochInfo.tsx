@@ -33,15 +33,15 @@ export function EpochInfo() {
   };
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Epoch Information</h2>
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+      <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">Epoch Information</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Current Epoch */}
-        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105">
           <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl">⏰</span>
-            <h3 className="text-lg font-semibold">Current Epoch</h3>
+            <span className="text-2xl drop-shadow-lg">⏰</span>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Current Epoch</h3>
           </div>
           
           {isEpochLoading ? (
@@ -54,19 +54,19 @@ export function EpochInfo() {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-indigo-100">Start Time</p>
-                <p className="font-medium">
+                <p className="font-medium text-sm drop-shadow-sm">
                   {epochInfo ? formatTime(epochInfo.lastRewardTime) : "Loading..."}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-indigo-100">End Time</p>
-                <p className="font-medium">
+                <p className="font-medium text-sm drop-shadow-sm">
                   {epochInfo ? formatTime(epochInfo.epochEnd) : "Loading..."}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-indigo-100">Duration</p>
-                <p className="font-medium">
+                <p className="font-medium text-sm drop-shadow-sm">
                   {epochInfo ? formatDuration(epochInfo.epochLength) : "Loading..."}
                 </p>
               </div>
@@ -75,10 +75,10 @@ export function EpochInfo() {
         </div>
 
         {/* Epoch Countdown */}
-        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white shadow-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
           <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl">🔥</span>
-            <h3 className="text-lg font-semibold">Time Remaining</h3>
+            <span className="text-2xl drop-shadow-lg">🔥</span>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Time Remaining</h3>
           </div>
           
           {isEpochLoading ? (
@@ -88,10 +88,10 @@ export function EpochInfo() {
             </div>
           ) : (
             <div>
-              <div className="text-3xl font-bold mb-2">
+              <div className="text-3xl font-bold mb-2 drop-shadow-lg">
                 {timeUntilEpochEnd !== null ? formatDuration(timeUntilEpochEnd) : "Loading..."}
               </div>
-              <p className="text-red-100 text-sm">
+              <p className="text-red-100 text-sm drop-shadow-sm">
                 Until next epoch
               </p>
             </div>
@@ -100,49 +100,49 @@ export function EpochInfo() {
       </div>
 
       {/* Rewards Information */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">Reward Distribution</h3>
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
+          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Reward Distribution</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Rewards</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {epochInfo ? formatTokenAmount(epochInfo.rewardPerEpoch) : "0"} XFI
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Native Rewards</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {epochInfo ? formatTokenAmount(epochInfo.nativeRewardPerEpoch) : "0"} XFI
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Total Rewards</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {epochInfo ? formatTokenAmount(epochInfo.rewardPerEpoch + epochInfo.nativeRewardPerEpoch) : "0"} XFI
               </span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">Fee Structure</h3>
+        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
+          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Fee Structure</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Dynamic Fee</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeDynamic / 100).toFixed(2) : "0"}%
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Fixed Fee</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeFixed / 100).toFixed(2) : "0"}%
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Early Unstake</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-medium drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeFixedEarly / 100).toFixed(2) : "0"}%
               </span>
             </div>
@@ -154,14 +154,14 @@ export function EpochInfo() {
       {epochInfo && (
         <div className="mt-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-purple-200">Epoch Progress</span>
-            <span className="text-sm text-white">
+            <span className="text-sm text-purple-200 drop-shadow-sm">Epoch Progress</span>
+            <span className="text-sm text-white drop-shadow-sm">
               {Math.floor(((epochInfo.epochEnd - epochInfo.lastRewardTime) / epochInfo.epochLength) * 100)}%
             </span>
           </div>
-          <div className="w-full bg-white/10 rounded-full h-2">
+          <div className="w-full bg-white/10 rounded-full h-2 shadow-inner">
             <div 
-              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 shadow-lg"
               style={{ 
                 width: `${Math.min(100, Math.max(0, ((epochInfo.epochEnd - epochInfo.lastRewardTime) / epochInfo.epochLength) * 100))}%` 
               }}
