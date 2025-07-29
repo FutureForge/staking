@@ -1,8 +1,6 @@
 import { getContract } from "@/modules/blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import StakingContractABI from "@/modules/blockchain/abi/staking.json";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 import { queryKeys } from "@/modules/query/query-keys";
 
@@ -35,13 +33,29 @@ export function useClaimNativeRewardsMutation() {
 
       return {
         transactionHash: transactionReceipt.transactionHash,
-        stakeType: "native",
       };
     },
+    meta: {
+      loadingMessage: {
+        title: "Claiming Native Rewards",
+        description: "Processing your native rewards claim...",
+      },
+      successMessage: {
+        title: "Native Rewards Claimed",
+        description: "Your native rewards have been successfully claimed!",
+      },
+      errorMessage: {
+        title: "Claim Failed",
+        description: "Failed to claim native rewards. Please try again.",
+      },
+    },
     onSuccess: (data, variables, context) => {
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: queryKeys.staking.nativeUserInfo(account?.address) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.staking.userNativePositions(account?.address) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.staking.nativeUserInfo(account?.address),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.staking.userNativePositions(account?.address),
+      });
     },
     onError: (error, variables, context) => {
       console.error("Claim native rewards error:", error);

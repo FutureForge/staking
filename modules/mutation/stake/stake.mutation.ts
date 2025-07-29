@@ -74,7 +74,7 @@ export function useStakeMutation() {
         });
 
         if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to stake token");
+          throw new Error("Failed to stake native tokens");
         }
 
         return {
@@ -99,7 +99,7 @@ export function useStakeMutation() {
         });
 
         if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to stake ERC20 token");
+          throw new Error("Failed to stake ERC20 tokens");
         }
 
         return {
@@ -109,6 +109,20 @@ export function useStakeMutation() {
           stakeType,
         };
       }
+    },
+    meta: {
+      loadingMessage: {
+        title: "Staking Tokens",
+        description: "Processing your stake transaction...",
+      },
+      successMessage: {
+        title: "Staking Successful",
+        description: "Your tokens have been successfully staked!",
+      },
+      errorMessage: {
+        title: "Staking Failed",
+        description: "Failed to stake tokens. Please try again.",
+      },
     },
     onSuccess: (data, variables, context) => {
       // Invalidate relevant queries to refresh data

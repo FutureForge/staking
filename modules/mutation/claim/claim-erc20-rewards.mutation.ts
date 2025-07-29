@@ -1,8 +1,6 @@
 import { getContract } from "@/modules/blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import StakingContractABI from "@/modules/blockchain/abi/staking.json";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 import { queryKeys } from "@/modules/query/query-keys";
 
@@ -35,11 +33,23 @@ export function useClaimERC20RewardsMutation() {
 
       return {
         transactionHash: transactionReceipt.transactionHash,
-        stakeType: "erc20",
       };
     },
+    meta: {
+      loadingMessage: {
+        title: "Claiming Rewards",
+        description: "Processing your ERC20 rewards claim...",
+      },
+      successMessage: {
+        title: "Rewards Claimed",
+        description: "Your ERC20 rewards have been successfully claimed!",
+      },
+      errorMessage: {
+        title: "Claim Failed",
+        description: "Failed to claim ERC20 rewards. Please try again.",
+      },
+    },
     onSuccess: (data, variables, context) => {
-      // Invalidate relevant queries to refresh data
       queryClient.invalidateQueries({
         queryKey: queryKeys.staking.pendingRewards(account?.address),
       });

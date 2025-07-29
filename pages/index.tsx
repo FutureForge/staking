@@ -1,5 +1,5 @@
-import Image from "next/image";
 import localFont from "next/font/local";
+import { StakingDashboard } from "@/modules/components";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,5 +13,9 @@ const geistMono = localFont({
 });
 
 export default function Home() {
-  return <h1>HELLO WORLD</h1>;
+  return (
+    <div className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+      <StakingDashboard />
+    </div>
+  );
 }

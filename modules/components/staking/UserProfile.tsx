@@ -1,0 +1,201 @@
+import { useUserChainInfo } from "@/modules/query";
+import { 
+  useUserPositionsERC20, 
+  useUserNativePositions, 
+  usePendingRewards,
+  useUserInfoERC20,
+  useUserInfoNative 
+} from "@/modules/query";
+
+export function UserProfile() {
+  const { account } = useUserChainInfo();
+  const userAddress = account?.address;
+
+  const { data: erc20Positions, isLoading: isERC20Loading } = useUserPositionsERC20(userAddress);
+  const { data: nativePositions, isLoading: isNativeLoading } = useUserNativePositions(userAddress);
+  const { data: pendingRewards, isLoading: isRewardsLoading } = usePendingRewards(userAddress);
+  const { data: userInfoERC20, isLoading: isUserInfoERC20Loading } = useUserInfoERC20(userAddress);
+  const { data: userInfoNative, isLoading: isUserInfoNativeLoading } = useUserInfoNative(userAddress);
+
+  const formatTokenAmount = (amount: number) => {
+    return (amount / 1e18).toFixed(4);
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+    return num.toLocaleString();
+  };
+
+  if (!userAddress) {
+    return (
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Wallet</h2>
+          <p className="text-purple-200">
+            Connect your wallet to view your staking profile and positions
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* User Header */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-lg">
+              {userAddress.slice(2, 4).toUpperCase()}
+            </span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Your Profile</h2>
+            <p className="text-purple-200 text-sm font-mono">
+              {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
+            </p>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/5 rounded-lg p-3">
+            <p className="text-purple-200 text-sm">Total Positions</p>
+            <p className="text-white font-bold text-lg">
+              {(erc20Positions?.length || 0) + (nativePositions?.length || 0)}
+            </p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3">
+            <p className="text-purple-200 text-sm">Total Weight</p>
+            <p className="text-white font-bold text-lg">
+              {formatNumber((userInfoERC20?.weight || 0) + (userInfoNative?.weight || 0))}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Rewards */}
+      <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+        <div className="flex items-center space-x-3 mb-4">
+          <span className="text-2xl">🎁</span>
+          <h3 className="text-lg font-semibold">Pending Rewards</h3>
+        </div>
+        
+        {isRewardsLoading ? (
+          <div className="animate-pulse space-y-3">
+            <div className="h-8 bg-white/20 rounded"></div>
+            <div className="h-6 bg-white/20 rounded w-3/4"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-green-100">ERC20 Rewards</span>
+              <span className="font-bold text-lg">
+                {pendingRewards ? formatTokenAmount(pendingRewards.erc20Rewards) : "0"} XFI
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-green-100">Native Rewards</span>
+              <span className="font-bold text-lg">
+                {pendingRewards ? formatTokenAmount(pendingRewards.nativeRewards) : "0"} XFI
+              </span>
+            </div>
+            <div className="border-t border-green-400/30 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-green-100 font-semibold">Total</span>
+                <span className="font-bold text-xl">
+                  {pendingRewards ? formatTokenAmount(pendingRewards.erc20Rewards + pendingRewards.nativeRewards) : "0"} XFI
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Position Summary */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Position Summary</h3>
+        
+        <div className="space-y-4">
+          {/* ERC20 Positions */}
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-purple-200 font-medium">ERC20 Positions</span>
+              <span className="text-white font-bold">
+                {erc20Positions?.length || 0}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-200">Weight</span>
+              <span className="text-white">
+                {formatNumber(userInfoERC20?.weight || 0)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-200">Reward Debt</span>
+              <span className="text-white">
+                {formatNumber(userInfoERC20?.rewardDebt || 0)}
+              </span>
+            </div>
+          </div>
+
+          {/* Native Positions */}
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-purple-200 font-medium">Native Positions</span>
+              <span className="text-white font-bold">
+                {nativePositions?.length || 0}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-200">Weight</span>
+              <span className="text-white">
+                {formatNumber(userInfoNative?.weight || 0)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-200">Reward Debt</span>
+              <span className="text-white">
+                {formatNumber(userInfoNative?.rewardDebt || 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+        
+        <div className="space-y-3">
+          <button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+            Stake ERC20 Tokens
+          </button>
+          <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+            Stake Native Tokens
+          </button>
+          <button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+            Claim All Rewards
+          </button>
+        </div>
+      </div>
+
+      {/* Network Status */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-white font-medium">Network Status</span>
+          </div>
+          <span className="text-green-400 text-sm font-medium">Connected</span>
+        </div>
+        <p className="text-purple-200 text-sm mt-2">
+          CrossFi Mainnet • All systems operational
+        </p>
+      </div>
+    </div>
+  );
+}

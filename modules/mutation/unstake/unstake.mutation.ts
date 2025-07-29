@@ -1,8 +1,6 @@
 import { getContract } from "@/modules/blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import StakingContractABI from "@/modules/blockchain/abi/staking.json";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 import { queryKeys } from "@/modules/query/query-keys";
 
@@ -15,8 +13,8 @@ export function useUnstakeMutation() {
       positionId,
       stakeType,
     }: {
-      stakeType: "native" | "erc20";
       positionId: number;
+      stakeType: "native" | "erc20";
     }) => {
       if (!account) {
         throw new Error("No active account found");
@@ -68,8 +66,21 @@ export function useUnstakeMutation() {
         };
       }
     },
+    meta: {
+      loadingMessage: {
+        title: "Unstaking Tokens",
+        description: "Processing your unstake transaction...",
+      },
+      successMessage: {
+        title: "Unstaking Successful",
+        description: "Your tokens have been successfully unstaked!",
+      },
+      errorMessage: {
+        title: "Unstaking Failed",
+        description: "Failed to unstake tokens. Please try again.",
+      },
+    },
     onSuccess: (data, variables, context) => {
-      // Invalidate relevant queries to refresh data
       if (variables.stakeType === "native") {
         queryClient.invalidateQueries({
           queryKey: queryKeys.staking.userNativePositions(account?.address),
