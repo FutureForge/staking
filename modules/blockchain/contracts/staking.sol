@@ -684,6 +684,14 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         emit Paused(false);
     }
 
+    // ─── VIEW FUNCTIONS ─────────────────────────────────────────────
+
+    /// @notice Get the current ERC20 position ID (next ID to be assigned).
+    /// @return The current ERC20 position ID.
+    function currentPositionId() external view returns (uint256) {
+        return _currentId;
+    }
+
     // ─── INTERNAL FUNCTIONS ─────────────────────────────────────────────
 
     /// @dev Internal function to remove a position id from an array.

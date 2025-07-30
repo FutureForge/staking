@@ -40,16 +40,11 @@ export function StatsOverview() {
       isLoading: isContractLoading,
     },
     {
-      title: "Total Users",
-      // value: stats
-      //   ? (stats.totalPositions + stats.totalNativePositions).toString()
-      //   : "0",
-      value: contractState
-        ? (
-            contractState.nativePositionIds + contractState.totalStaked
-          ).toString()
+      title: "Total Positions",
+      value: stats
+        ? (stats.totalPositions + stats.totalNativePositions).toString()
         : "0",
-      unit: "Users",
+      unit: "Positions",
       icon: "👥",
       color: "from-green-500 to-green-600",
       hoverColor: "from-green-600 to-green-700",
@@ -128,9 +123,7 @@ export function StatsOverview() {
               <span className="text-purple-200">Native Weight</span>
               <span className="text-white font-medium">
                 {contractState
-                  ? formatNumber(
-                      Number(formatTokenAmount(contractState.totalNativeWeight))
-                    )
+                  ? formatNumber(contractState.totalNativeWeight)
                   : "0"}
               </span>
             </div>

@@ -121,10 +121,19 @@ export function usePositionERC20(positionId: number) {
   return useQuery({
     queryKey: queryKeys.staking.position(positionId),
     queryFn: async (): Promise<Position> => {
-      return await getPositionERC20(positionId);
+      try {
+        return await getPositionERC20(positionId);
+      } catch (error) {
+        console.error(
+          `Error in usePositionERC20 for position ${positionId}:`,
+          error
+        );
+        throw error;
+      }
     },
     enabled: positionId > 0,
     refetchInterval: 30000, // refetch every 30 seconds
+    retry: 1, // Only retry once
   });
 }
 
@@ -133,10 +142,19 @@ export function usePositionNative(positionId: number) {
   return useQuery({
     queryKey: queryKeys.staking.nativePosition(positionId),
     queryFn: async (): Promise<Position> => {
-      return await getPositionNative(positionId);
+      try {
+        return await getPositionNative(positionId);
+      } catch (error) {
+        console.error(
+          `Error in usePositionNative for position ${positionId}:`,
+          error
+        );
+        throw error;
+      }
     },
     enabled: positionId > 0,
     refetchInterval: 30000, // refetch every 30 seconds
+    retry: 1, // Only retry once
   });
 }
 
@@ -403,8 +421,6 @@ export function useBondTokenBalances() {
 // Get staking statistics
 export function useStakingStats() {
   const { data: contractState } = useContractState();
-  const { data: userPositions } = useUserPositionsERC20();
-  const { data: userNativePositions } = useUserNativePositions();
 
   return useQuery({
     queryKey: queryKeys.staking.stats,
@@ -418,12 +434,9 @@ export function useStakingStats() {
         };
       }
 
-      console.log({ userPositions });
-
-      const totalPositions = userPositions?.length || 0;
-      const totalNativePositions = userNativePositions?.length || 0;
-
-      console.log({ totalPositions, totalNativePositions });
+      // Use the correct position IDs for each type
+      const totalPositions = contractState.currentPositionId - 1; // Current ID minus 1 gives us the highest assigned ID
+      const totalNativePositions = contractState.nativePositionIds; // This is the highest native position ID
 
       const averageStakeAmount =
         contractState.totalStaked > 0
@@ -443,6 +456,6 @@ export function useStakingStats() {
       };
     },
     enabled: !!contractState,
-    refetchInterval: 5000, // refetch every 30 seconds
+    refetchInterval: 5000, // refetch every 5 seconds
   });
 }

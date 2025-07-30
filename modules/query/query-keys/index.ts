@@ -40,6 +40,8 @@ export const queryKeys = {
     stakingTokenAddress: ["staking", "stakingTokenAddress"] as const,
     nativeStakingTokenAddress: ["staking", "nativeStakingTokenAddress"] as const,
     erc20TokenAddress: ["staking", "erc20TokenAddress"] as const,
+    stokenBalance: (address?: string) => ["staking", "stokenBalance", address] as const,
+    snativeBalance: (address?: string) => ["staking", "snativeBalance", address] as const,
     
     // Statistics
     stats: ["staking", "stats"] as const,

@@ -55,6 +55,7 @@ export interface ContractState {
   accRewardPerWeight: number;
   accNativeRewardPerWeight: number;
   nativePositionIds: number;
+  currentPositionId: number;
 }
 
 export interface PendingRewards {

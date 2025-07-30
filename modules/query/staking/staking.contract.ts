@@ -1,7 +1,12 @@
-import { getContract, getContractCustom } from "@/modules/blockchain";
+import {
+  getContract,
+  getContractCustom,
+  getContractEthers,
+} from "@/modules/blockchain";
 import { readContract } from "thirdweb";
-import { chain1, client } from "@/utils/configs";
+import { chain1, client, chain1StakingContract } from "@/utils/configs";
 import TokenContract from "@/modules/blockchain/abi/token.json";
+import StakingContract from "@/modules/blockchain/abi/staking.json";
 
 const stakingContract = getContract({ type: "staking" });
 
@@ -32,25 +37,25 @@ export async function getClaimableNativeRewards(
 export async function getUserPositionsERC20(
   address: string
 ): Promise<number[]> {
-  const positions = await readContract({
-    contract: stakingContract,
-    method:
-      "function userPositions(address _user) view returns (uint256[] memory)",
-    params: [address],
+  const contract = getContractEthers({
+    contractAddress: chain1StakingContract,
+    abi: StakingContract,
   });
-  return (positions as readonly bigint[]).map((pos) => Number(pos));
+
+  const positions = await contract.userPositions(address);
+  return positions.map((pos: bigint) => Number(pos));
 }
 
 export async function getUserNativePositions(
   address: string
 ): Promise<number[]> {
-  const positions = await readContract({
-    contract: stakingContract,
-    method:
-      "function userNativePositions(address _user) view returns (uint256[] memory)",
-    params: [address],
+  const contract = getContractEthers({
+    contractAddress: chain1StakingContract,
+    abi: StakingContract,
   });
-  return (positions as readonly bigint[]).map((pos) => Number(pos));
+
+  const positions = await contract.userNativePositions(address);
+  return positions.map((pos: bigint) => Number(pos));
 }
 
 export async function getPositionERC20(positionId: number): Promise<{
@@ -62,32 +67,27 @@ export async function getPositionERC20(positionId: number): Promise<{
   plan: "DYNAMIC" | "FIXED";
   isNative: boolean;
 }> {
-  const position = await readContract({
-    contract: stakingContract,
-    method:
-      "function positions(uint256) view returns ((uint128 amount, uint40 unlockTime, uint16 multiplierBps, uint32 duration, bool active, Plan plan, bool isNative))",
-    params: [BigInt(positionId)],
-  });
+  try {
+    const contract = getContractEthers({
+      contractAddress: chain1StakingContract,
+      abi: StakingContract,
+    });
 
-  const pos = position as unknown as {
-    amount: bigint;
-    unlockTime: bigint;
-    multiplierBps: bigint;
-    duration: bigint;
-    active: boolean;
-    plan: bigint;
-    isNative: boolean;
-  };
+    const position = await contract.positions(positionId);
 
-  return {
-    amount: Number(pos.amount),
-    unlockTime: Number(pos.unlockTime),
-    multiplierBps: Number(pos.multiplierBps),
-    duration: Number(pos.duration),
-    active: pos.active,
-    plan: Number(pos.plan) === 0 ? "DYNAMIC" : "FIXED",
-    isNative: pos.isNative,
-  };
+    return {
+      amount: Number(position.amount),
+      unlockTime: Number(position.unlockTime),
+      multiplierBps: Number(position.multiplierBps),
+      duration: Number(position.duration),
+      active: position.active,
+      plan: Number(position.plan) === 0 ? "DYNAMIC" : "FIXED",
+      isNative: position.isNative,
+    };
+  } catch (error) {
+    console.error(`Error fetching ERC20 position ${positionId}:`, error);
+    throw error;
+  }
 }
 
 export async function getPositionNative(positionId: number): Promise<{
@@ -99,32 +99,27 @@ export async function getPositionNative(positionId: number): Promise<{
   plan: "DYNAMIC" | "FIXED";
   isNative: boolean;
 }> {
-  const position = await readContract({
-    contract: stakingContract,
-    method:
-      "function nativePositions(uint256) view returns ((uint128 amount, uint40 unlockTime, uint16 multiplierBps, uint32 duration, bool active, Plan plan, bool isNative))",
-    params: [BigInt(positionId)],
-  });
+  try {
+    const contract = getContractEthers({
+      contractAddress: chain1StakingContract,
+      abi: StakingContract,
+    });
 
-  const pos = position as unknown as {
-    amount: bigint;
-    unlockTime: bigint;
-    multiplierBps: bigint;
-    duration: bigint;
-    active: boolean;
-    plan: bigint;
-    isNative: boolean;
-  };
+    const position = await contract.nativePositions(positionId);
 
-  return {
-    amount: Number(pos.amount),
-    unlockTime: Number(pos.unlockTime),
-    multiplierBps: Number(pos.multiplierBps),
-    duration: Number(pos.duration),
-    active: pos.active,
-    plan: Number(pos.plan) === 0 ? "DYNAMIC" : "FIXED",
-    isNative: pos.isNative,
-  };
+    return {
+      amount: Number(position.amount),
+      unlockTime: Number(position.unlockTime),
+      multiplierBps: Number(position.multiplierBps),
+      duration: Number(position.duration),
+      active: position.active,
+      plan: Number(position.plan) === 0 ? "DYNAMIC" : "FIXED",
+      isNative: position.isNative,
+    };
+  } catch (error) {
+    console.error(`Error fetching native position ${positionId}:`, error);
+    throw error;
+  }
 }
 
 // User info related contract calls
@@ -132,66 +127,75 @@ export async function getUserInfoERC20(address: string): Promise<{
   weight: number;
   rewardDebt: number;
 }> {
-  const userInfo = await readContract({
-    contract: stakingContract,
-    method:
-      "function userInfo(address) view returns ((uint128 weight, uint128 rewardDebt))",
-    params: [address],
-  });
+  try {
+    const contract = getContractEthers({
+      contractAddress: chain1StakingContract,
+      abi: StakingContract,
+    });
 
-  const info = userInfo as { weight: bigint; rewardDebt: bigint };
+    const userInfo = await contract.userInfo(address);
 
-  return {
-    weight: Number(info.weight),
-    rewardDebt: Number(info.rewardDebt),
-  };
+    return {
+      weight: Number(userInfo.weight),
+      rewardDebt: Number(userInfo.rewardDebt),
+    };
+  } catch (error) {
+    console.error(`Error fetching ERC20 user info for ${address}:`, error);
+    throw error;
+  }
 }
 
 export async function getUserInfoNative(address: string): Promise<{
   weight: number;
   rewardDebt: number;
 }> {
-  const userInfo = await readContract({
-    contract: stakingContract,
-    method:
-      "function nativeUserInfo(address) view returns ((uint128 weight, uint128 rewardDebt))",
-    params: [address],
-  });
+  try {
+    const contract = getContractEthers({
+      contractAddress: chain1StakingContract,
+      abi: StakingContract,
+    });
 
-  const info = userInfo as { weight: bigint; rewardDebt: bigint };
+    const userInfo = await contract.nativeUserInfo(address);
 
-  return {
-    weight: Number(info.weight),
-    rewardDebt: Number(info.rewardDebt),
-  };
+    return {
+      weight: Number(userInfo.weight),
+      rewardDebt: Number(userInfo.rewardDebt),
+    };
+  } catch (error) {
+    console.error(`Error fetching native user info for ${address}:`, error);
+    throw error;
+  }
 }
 
 // Token info related contract calls
 export async function getERC20TokenAddress(): Promise<string> {
-  const tokenAddress = await readContract({
-    contract: stakingContract,
-    method: "function TOKEN() view returns (address)",
-    params: [],
+  const contract = getContractEthers({
+    contractAddress: chain1StakingContract,
+    abi: StakingContract,
   });
-  return tokenAddress as string;
+
+  const tokenAddress = await contract.TOKEN();
+  return tokenAddress;
 }
 
 export async function getStakingTokenAddress(): Promise<string> {
-  const stokenAddress = await readContract({
-    contract: stakingContract,
-    method: "function STOKEN() view returns (address)",
-    params: [],
+  const contract = getContractEthers({
+    contractAddress: chain1StakingContract,
+    abi: StakingContract,
   });
-  return stokenAddress as string;
+
+  const stokenAddress = await contract.STOKEN();
+  return stokenAddress;
 }
 
 export async function getNativeStakingTokenAddress(): Promise<string> {
-  const snativeAddress = await readContract({
-    contract: stakingContract,
-    method: "function SNATIVE() view returns (address)",
-    params: [],
+  const contract = getContractEthers({
+    contractAddress: chain1StakingContract,
+    abi: StakingContract,
   });
-  return snativeAddress as string;
+
+  const snativeAddress = await contract.SNATIVE();
+  return snativeAddress;
 }
 
 // Epoch info related contract calls
@@ -317,60 +321,47 @@ export async function getContractState(): Promise<{
   accRewardPerWeight: number;
   accNativeRewardPerWeight: number;
   nativePositionIds: number;
+  currentPositionId: number;
 }> {
-  const [
-    totalStaked,
-    totalNativeStaked,
-    totalWeight,
-    totalNativeWeight,
-    accRewardPerWeight,
-    accNativeRewardPerWeight,
-    nativePositionIds,
-  ] = await Promise.all([
-    readContract({
-      contract: stakingContract,
-      method: "function totalStaked() view returns (uint256)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function totalNativeStaked() view returns (uint256)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function totalWeight() view returns (uint128)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function totalNativeWeight() view returns (uint128)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function accRewardPerWeight() view returns (uint128)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function accNativeRewardPerWeight() view returns (uint128)",
-      params: [],
-    }),
-    readContract({
-      contract: stakingContract,
-      method: "function nativePositionIds() view returns (uint256)",
-      params: [],
-    }),
-  ]);
+  try {
+    const contract = getContractEthers({
+      contractAddress: chain1StakingContract,
+      abi: StakingContract,
+    });
 
-  return {
-    totalStaked: Number(totalStaked),
-    totalNativeStaked: Number(totalNativeStaked),
-    totalWeight: Number(totalWeight),
-    totalNativeWeight: Number(totalNativeWeight),
-    accRewardPerWeight: Number(accRewardPerWeight),
-    accNativeRewardPerWeight: Number(accNativeRewardPerWeight),
-    nativePositionIds: Number(nativePositionIds),
-  };
+    const [
+      totalStaked,
+      totalNativeStaked,
+      totalWeight,
+      totalNativeWeight,
+      accRewardPerWeight,
+      accNativeRewardPerWeight,
+      nativePositionIds,
+      // currentPositionId,
+    ] = await Promise.all([
+      contract.totalStaked(),
+      contract.totalNativeStaked(),
+      contract.totalWeight(),
+      contract.totalNativeWeight(),
+      contract.accRewardPerWeight(),
+      contract.accNativeRewardPerWeight(),
+      contract.nativePositionIds(),
+      // contract.currentPositionId(),
+    ]);
+
+    return {
+      totalStaked: Number(totalStaked),
+      totalNativeStaked: Number(totalNativeStaked),
+      totalWeight: Number(totalWeight),
+      totalNativeWeight: Number(totalNativeWeight),
+      accRewardPerWeight: Number(accRewardPerWeight),
+      accNativeRewardPerWeight: Number(accNativeRewardPerWeight),
+      nativePositionIds: Number(nativePositionIds),
+      // currentPositionId: Number(currentPositionId),
+      currentPositionId: 10,
+    };
+  } catch (error) {
+    console.error("Error fetching contract state:", error);
+    throw error;
+  }
 }

@@ -13,6 +13,7 @@ import {
   useClaimNativeRewardsMutation,
 } from "@/modules/mutation";
 import { StakingModal } from "./StakingModal";
+import { UnstakeModal } from "./UnstakeModal";
 import { IS_TESTNET } from "@/utils/configs";
 
 export function UserProfile() {
@@ -21,6 +22,7 @@ export function UserProfile() {
 
   const [isERC20ModalOpen, setIsERC20ModalOpen] = useState(false);
   const [isNativeModalOpen, setIsNativeModalOpen] = useState(false);
+  const [isUnstakeModalOpen, setIsUnstakeModalOpen] = useState(false);
 
   const { data: erc20Positions, isLoading: isERC20Loading } =
     useUserPositionsERC20();
@@ -331,6 +333,17 @@ export function UserProfile() {
             Stake Native Tokens
           </button>
           <button
+            onClick={() => setIsUnstakeModalOpen(true)}
+            disabled={(erc20Positions?.length || 0) + (nativePositions?.length || 0) === 0}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+              (erc20Positions?.length || 0) + (nativePositions?.length || 0) > 0
+                ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Unstake Positions
+          </button>
+          <button
             onClick={handleClaimAllRewards}
             disabled={!hasRewardsToClaim || isClaiming}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
@@ -370,6 +383,10 @@ export function UserProfile() {
         isOpen={isNativeModalOpen}
         onClose={() => setIsNativeModalOpen(false)}
         stakeType="native"
+      />
+      <UnstakeModal
+        isOpen={isUnstakeModalOpen}
+        onClose={() => setIsUnstakeModalOpen(false)}
       />
     </div>
   );
