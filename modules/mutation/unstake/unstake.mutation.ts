@@ -29,20 +29,28 @@ export function useUnstakeMutation() {
           params: [BigInt(positionId)],
         });
 
-        const transactionReceipt = await sendAndConfirmTransaction({
-          account,
-          transaction,
-        });
+        try {
+          const transactionReceipt = await sendAndConfirmTransaction({
+            account,
+            transaction,
+          });
 
-        if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to unstake native tokens");
+          if (transactionReceipt.status === "reverted") {
+            throw new Error("Failed to unstake native tokens");
+          }
+
+          return {
+            transactionHash: transactionReceipt.transactionHash,
+            positionId,
+            stakeType,
+          };
+        } catch (error) {
+          // Handle transaction revert errors
+          if (error instanceof Error && error.message.includes("execution reverted")) {
+            throw new Error("Transaction failed: Position not found or already unstaked");
+          }
+          throw error;
         }
-
-        return {
-          transactionHash: transactionReceipt.transactionHash,
-          positionId,
-          stakeType,
-        };
       } else if (stakeType === "erc20") {
         const transaction = prepareContractCall({
           contract: stakingContract,
@@ -50,20 +58,28 @@ export function useUnstakeMutation() {
           params: [BigInt(positionId)],
         });
 
-        const transactionReceipt = await sendAndConfirmTransaction({
-          account,
-          transaction,
-        });
+        try {
+          const transactionReceipt = await sendAndConfirmTransaction({
+            account,
+            transaction,
+          });
 
-        if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to unstake ERC20 tokens");
+          if (transactionReceipt.status === "reverted") {
+            throw new Error("Failed to unstake ERC20 tokens");
+          }
+
+          return {
+            transactionHash: transactionReceipt.transactionHash,
+            positionId,
+            stakeType,
+          };
+        } catch (error) {
+          // Handle transaction revert errors
+          if (error instanceof Error && error.message.includes("execution reverted")) {
+            throw new Error("Transaction failed: Position not found or already unstaked");
+          }
+          throw error;
         }
-
-        return {
-          transactionHash: transactionReceipt.transactionHash,
-          positionId,
-          stakeType,
-        };
       }
     },
     meta: {

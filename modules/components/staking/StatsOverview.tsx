@@ -1,13 +1,16 @@
 import { useContractState, useStakingStats } from "@/modules/query";
 
 export function StatsOverview() {
-  const { data: contractState, isLoading: isContractLoading } = useContractState();
+  const { data: contractState, isLoading: isContractLoading } =
+    useContractState();
   const { data: stats, isLoading: isStatsLoading } = useStakingStats();
 
+  console.log({ stats, contractState });
+
   const formatNumber = (num: number) => {
-    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
-    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+    if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+    if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+    if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
     return num.toLocaleString();
   };
 
@@ -27,7 +30,9 @@ export function StatsOverview() {
     },
     {
       title: "Total Staked (Native)",
-      value: contractState ? formatTokenAmount(contractState.totalNativeStaked) : "0",
+      value: contractState
+        ? formatTokenAmount(contractState.totalNativeStaked)
+        : "0",
       unit: "XFI",
       icon: "⚡",
       color: "from-purple-500 to-purple-600",
@@ -36,7 +41,14 @@ export function StatsOverview() {
     },
     {
       title: "Total Users",
-      value: stats ? (stats.totalPositions + stats.totalNativePositions).toString() : "0",
+      // value: stats
+      //   ? (stats.totalPositions + stats.totalNativePositions).toString()
+      //   : "0",
+      value: contractState
+        ? (
+            contractState.nativePositionIds + contractState.totalStaked
+          ).toString()
+        : "0",
       unit: "Users",
       icon: "👥",
       color: "from-green-500 to-green-600",
@@ -56,8 +68,10 @@ export function StatsOverview() {
 
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
-      <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">Platform Overview</h2>
-      
+      <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">
+        Platform Overview
+      </h2>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {statsCards.map((card, index) => (
           <div
@@ -68,13 +82,15 @@ export function StatsOverview() {
             <div className="absolute top-0 right-0 w-16 h-16 lg:w-20 lg:h-20 opacity-10">
               <div className="text-3xl lg:text-4xl">{card.icon}</div>
             </div>
-            
+
             <div className="relative z-10">
               <div className="flex items-center space-x-2 mb-2">
                 <span className="text-xl lg:text-2xl">{card.icon}</span>
-                <h3 className="text-xs lg:text-sm font-medium text-white/80 leading-tight">{card.title}</h3>
+                <h3 className="text-xs lg:text-sm font-medium text-white/80 leading-tight">
+                  {card.title}
+                </h3>
               </div>
-              
+
               {card.isLoading ? (
                 <div className="animate-pulse">
                   <div className="h-6 lg:h-8 bg-white/20 rounded mb-1"></div>
@@ -98,7 +114,9 @@ export function StatsOverview() {
       {/* Additional Stats */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Weight Distribution</h3>
+          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+            Weight Distribution
+          </h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Weight</span>
@@ -109,14 +127,20 @@ export function StatsOverview() {
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Native Weight</span>
               <span className="text-white font-medium">
-                {contractState ? formatNumber(contractState.totalNativeWeight) : "0"}
+                {contractState
+                  ? formatNumber(
+                      Number(formatTokenAmount(contractState.totalNativeWeight))
+                    )
+                  : "0"}
               </span>
             </div>
           </div>
         </div>
 
         <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">Position Stats</h3>
+          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+            Position Stats
+          </h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Positions</span>

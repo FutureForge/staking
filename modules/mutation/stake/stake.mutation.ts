@@ -39,14 +39,7 @@ export function useStakeMutation() {
     }: {
       stakeType: "native" | "erc20";
       amount: number;
-      duration:
-        | "dynamic"
-        | "15days"
-        | "30days"
-        | "60days"
-        | "90days"
-        | "180days"
-        | "365days";
+      duration: "dynamic" | "30days" | "90days" | "180days" | "365days";
     }) => {
       if (!account) {
         throw new Error("No active account found");
@@ -60,6 +53,8 @@ export function useStakeMutation() {
       // Convert duration string to seconds
       const durationInSeconds = getDurationInSeconds(duration);
 
+      console.log({ durationInSeconds, duration, amount });
+
       if (stakeType === "native") {
         const transaction = prepareContractCall({
           contract: stakingContract,
@@ -68,21 +63,37 @@ export function useStakeMutation() {
           value: ethers.parseEther(amount.toString()),
         });
 
-        const transactionReceipt = await sendAndConfirmTransaction({
-          account,
-          transaction,
-        });
+        console.log({ account, transaction });
 
-        if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to stake native tokens");
+        try {
+          const transactionReceipt = await sendAndConfirmTransaction({
+            account,
+            transaction,
+          });
+
+          if (transactionReceipt.status === "reverted") {
+            throw new Error("Failed to stake native tokens");
+          }
+
+          return {
+            transactionHash: transactionReceipt.transactionHash,
+            amount,
+            duration,
+            stakeType,
+          };
+        } catch (error) {
+          // Handle transaction revert errors
+          if (
+            error instanceof Error &&
+            error.message.includes("execution reverted")
+          ) {
+            throw new Error(
+              "Transaction failed: Insufficient balance or invalid parameters"
+            );
+          }
+          // Re-throw the error to be handled by the mutation's error handler
+          throw error;
         }
-
-        return {
-          transactionHash: transactionReceipt.transactionHash,
-          amount,
-          duration,
-          stakeType,
-        };
       } else if (stakeType === "erc20") {
         const transaction = prepareContractCall({
           contract: stakingContract,
@@ -93,21 +104,38 @@ export function useStakeMutation() {
           ],
         });
 
-        const transactionReceipt = await sendAndConfirmTransaction({
-          account,
-          transaction,
-        });
+        console.log({ transaction });
 
-        if (transactionReceipt.status === "reverted") {
-          throw new Error("Failed to stake ERC20 tokens");
+        try {
+          const transactionReceipt = await sendAndConfirmTransaction({
+            account,
+            transaction,
+          });
+
+          if (transactionReceipt.status === "reverted") {
+            throw new Error("Failed to stake ERC20 tokens");
+          }
+
+          return {
+            transactionHash: transactionReceipt.transactionHash,
+            amount,
+            duration,
+            stakeType,
+          };
+        } catch (error) {
+          console.log({ error });
+          // Handle transaction revert errors
+          if (
+            error instanceof Error &&
+            error.message.includes("execution reverted")
+          ) {
+            throw new Error(
+              "Transaction failed: Insufficient balance or invalid parameters"
+            );
+          }
+          // Re-throw the error to be handled by the mutation's error handler
+          throw error;
         }
-
-        return {
-          transactionHash: transactionReceipt.transactionHash,
-          amount,
-          duration,
-          stakeType,
-        };
       }
     },
     meta: {

@@ -6,8 +6,12 @@ import {
   usePendingRewards,
   useUserInfoERC20,
   useUserInfoNative,
+  useBondTokenBalances,
 } from "@/modules/query";
-import { useClaimERC20RewardsMutation, useClaimNativeRewardsMutation } from "@/modules/mutation";
+import {
+  useClaimERC20RewardsMutation,
+  useClaimNativeRewardsMutation,
+} from "@/modules/mutation";
 import { StakingModal } from "./StakingModal";
 import { IS_TESTNET } from "@/utils/configs";
 
@@ -19,15 +23,17 @@ export function UserProfile() {
   const [isNativeModalOpen, setIsNativeModalOpen] = useState(false);
 
   const { data: erc20Positions, isLoading: isERC20Loading } =
-    useUserPositionsERC20(userAddress);
+    useUserPositionsERC20();
   const { data: nativePositions, isLoading: isNativeLoading } =
-    useUserNativePositions(userAddress);
+    useUserNativePositions();
   const { data: pendingRewards, isLoading: isRewardsLoading } =
-    usePendingRewards(userAddress);
+    usePendingRewards();
   const { data: userInfoERC20, isLoading: isUserInfoERC20Loading } =
-    useUserInfoERC20(userAddress);
+    useUserInfoERC20();
   const { data: userInfoNative, isLoading: isUserInfoNativeLoading } =
-    useUserInfoNative(userAddress);
+    useUserInfoNative();
+  const { data: bondTokenBalances, isLoading: isBondTokenBalancesLoading } =
+    useBondTokenBalances();
 
   const claimERC20Mutation = useClaimERC20RewardsMutation();
   const claimNativeMutation = useClaimNativeRewardsMutation();
@@ -47,25 +53,27 @@ export function UserProfile() {
     try {
       // Claim both ERC20 and Native rewards
       const promises = [];
-      
+
       if (pendingRewards && pendingRewards.erc20Rewards > 0) {
-        promises.push(claimERC20Mutation.mutateAsync());
+        promises.push(claimERC20Mutation.mutate());
       }
-      
+
       if (pendingRewards && pendingRewards.nativeRewards > 0) {
-        promises.push(claimNativeMutation.mutateAsync());
+        promises.push(claimNativeMutation.mutate());
       }
-      
+
       await Promise.all(promises);
     } catch (error) {
       console.error("Claim rewards error:", error);
     }
   };
 
-  const hasRewardsToClaim = pendingRewards && 
+  const hasRewardsToClaim =
+    pendingRewards &&
     (pendingRewards.erc20Rewards > 0 || pendingRewards.nativeRewards > 0);
 
-  const isClaiming = claimERC20Mutation.isPending || claimNativeMutation.isPending;
+  const isClaiming =
+    claimERC20Mutation.isPending || claimNativeMutation.isPending;
 
   if (!userAddress) {
     return (
@@ -120,6 +128,26 @@ export function UserProfile() {
             </p>
           </div>
         </div>
+        
+        {/* Bond Token Stats */}
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-sm">STOKEN Balance</p>
+            <p className="text-white font-bold text-lg drop-shadow-sm">
+              {bondTokenBalances
+                ? formatTokenAmount(bondTokenBalances.stokenBalance)
+                : "0"}
+            </p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-sm">SNATIVE Balance</p>
+            <p className="text-white font-bold text-lg drop-shadow-sm">
+              {bondTokenBalances
+                ? formatTokenAmount(bondTokenBalances.snativeBalance)
+                : "0"}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Pending Rewards */}
@@ -167,6 +195,58 @@ export function UserProfile() {
                       )
                     : "0"}{" "}
                   XFI
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bond Token Balances */}
+      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white shadow-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+        <div className="flex items-center space-x-3 mb-4">
+          <span className="text-2xl drop-shadow-lg">🏦</span>
+          <h3 className="text-lg font-semibold drop-shadow-sm">
+            Bond Token Balances
+          </h3>
+        </div>
+
+        {isBondTokenBalancesLoading ? (
+          <div className="animate-pulse space-y-3">
+            <div className="h-8 bg-white/20 rounded"></div>
+            <div className="h-6 bg-white/20 rounded w-3/4"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-blue-100">STOKEN Balance</span>
+              <span className="font-bold text-lg drop-shadow-sm">
+                {bondTokenBalances
+                  ? formatTokenAmount(bondTokenBalances.stokenBalance)
+                  : "0"}{" "}
+                STOKEN
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-100">SNATIVE Balance</span>
+              <span className="font-bold text-lg drop-shadow-sm">
+                {bondTokenBalances
+                  ? formatTokenAmount(bondTokenBalances.snativeBalance)
+                  : "0"}{" "}
+                SNATIVE
+              </span>
+            </div>
+            <div className="border-t border-blue-400/30 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-blue-100 font-semibold">Total Bond Tokens</span>
+                <span className="font-bold text-xl drop-shadow-sm">
+                  {bondTokenBalances
+                    ? formatTokenAmount(
+                        bondTokenBalances.stokenBalance +
+                          bondTokenBalances.snativeBalance
+                      )
+                    : "0"}{" "}
+                  Tokens
                 </span>
               </div>
             </div>
@@ -238,19 +318,19 @@ export function UserProfile() {
         </h3>
 
         <div className="space-y-3">
-          <button 
+          <button
             onClick={() => setIsERC20ModalOpen(true)}
             className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
           >
             Stake ERC20 Tokens
           </button>
-          <button 
+          <button
             onClick={() => setIsNativeModalOpen(true)}
             className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
           >
             Stake Native Tokens
           </button>
-          <button 
+          <button
             onClick={handleClaimAllRewards}
             disabled={!hasRewardsToClaim || isClaiming}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
@@ -276,8 +356,7 @@ export function UserProfile() {
           <span className="text-green-400 text-sm font-medium">Connected</span>
         </div>
         <p className="text-purple-200 text-sm mt-2">
-          CrossFi {IS_TESTNET ? "Testnet" : "Mainnet"} • All systems
-          operational
+          CrossFi {IS_TESTNET ? "Testnet" : "Mainnet"} • All systems operational
         </p>
       </div>
 

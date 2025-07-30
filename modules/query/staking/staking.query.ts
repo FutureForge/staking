@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUserChainInfo } from "@/modules/query";
 import { queryKeys } from "@/modules/query/query-keys";
+import { useWalletBalance } from "thirdweb/react";
+import { chain1, client } from "@/utils/configs";
 import {
   Position,
   UserInfo,
@@ -11,6 +13,7 @@ import {
   ContractState,
   PendingRewards,
   StakingStats,
+  BondTokenBalances,
 } from "./staking.types";
 import {
   getPendingRewardsERC20,
@@ -22,16 +25,20 @@ import {
   getUserInfoERC20,
   getUserInfoNative,
   getERC20TokenAddress,
-  getERC20TokenBalance,
   getStakingTokenAddress,
   getNativeStakingTokenAddress,
   getEpochInfo,
   getFeeInfo,
   getContractState,
+  getNextEpochTime,
+  getTimeUntilNextEpoch,
 } from "./staking.contract";
 
 // Get pending ERC20 rewards for a user
-export function usePendingRewardsERC20(address?: string) {
+export function usePendingRewardsERC20() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
   return useQuery({
     queryKey: queryKeys.staking.pendingRewards(address),
     queryFn: async (): Promise<number> => {
@@ -44,8 +51,11 @@ export function usePendingRewardsERC20(address?: string) {
 }
 
 // Get pending native rewards for a user
-export function usePendingRewardsNative(address?: string) {
-  const { data: userNativePositions } = useUserNativePositions(address);
+export function usePendingRewardsNative() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
+  const { data: userNativePositions } = useUserNativePositions();
 
   return useQuery({
     queryKey: queryKeys.staking.nativeUserInfo(address),
@@ -75,7 +85,10 @@ export function usePendingRewardsNative(address?: string) {
 }
 
 // Get user ERC20 positions
-export function useUserPositionsERC20(address?: string) {
+export function useUserPositionsERC20() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
   return useQuery({
     queryKey: queryKeys.staking.userPositions(address),
     queryFn: async (): Promise<number[]> => {
@@ -88,7 +101,10 @@ export function useUserPositionsERC20(address?: string) {
 }
 
 // Get user native positions
-export function useUserNativePositions(address?: string) {
+export function useUserNativePositions() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
   return useQuery({
     queryKey: queryKeys.staking.userNativePositions(address),
     queryFn: async (): Promise<number[]> => {
@@ -176,6 +192,28 @@ export function useEpochInfo() {
   });
 }
 
+// Get next epoch time
+export function useNextEpochTime() {
+  return useQuery({
+    queryKey: queryKeys.staking.nextEpochTime,
+    queryFn: async (): Promise<Date> => {
+      return await getNextEpochTime();
+    },
+    refetchInterval: 30000, // refetch every 30 seconds
+  });
+}
+
+// Get time until next epoch
+export function useTimeUntilNextEpoch() {
+  return useQuery({
+    queryKey: queryKeys.staking.timeUntilNextEpoch,
+    queryFn: async (): Promise<number> => {
+      return await getTimeUntilNextEpoch();
+    },
+    refetchInterval: 10000, // refetch every 10 seconds for countdown
+  });
+}
+
 // Get fee information
 export function useFeeInfo() {
   return useQuery({
@@ -199,7 +237,10 @@ export function useContractState() {
 }
 
 // Get user info for ERC20 staking
-export function useUserInfoERC20(address?: string) {
+export function useUserInfoERC20() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
   return useQuery({
     queryKey: queryKeys.staking.userInfo(address),
     queryFn: async (): Promise<UserInfo> => {
@@ -214,7 +255,10 @@ export function useUserInfoERC20(address?: string) {
 }
 
 // Get user info for native staking
-export function useUserInfoNative(address?: string) {
+export function useUserInfoNative() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
   return useQuery({
     queryKey: queryKeys.staking.nativeUserInfo(address),
     queryFn: async (): Promise<UserInfo> => {
@@ -229,9 +273,12 @@ export function useUserInfoNative(address?: string) {
 }
 
 // Get all pending rewards for a user
-export function usePendingRewards(address?: string) {
-  const { data: erc20Rewards } = usePendingRewardsERC20(address);
-  const { data: nativeRewards } = usePendingRewardsNative(address);
+export function usePendingRewards() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
+  const { data: erc20Rewards } = usePendingRewardsERC20();
+  const { data: nativeRewards } = usePendingRewardsNative();
 
   return useQuery({
     queryKey: queryKeys.staking.pendingRewards(address),
@@ -247,16 +294,110 @@ export function usePendingRewards(address?: string) {
 }
 
 // Get ERC20 token balance for a user
-export function useERC20TokenBalance(address?: string) {
-  return useQuery({
-    queryKey: queryKeys.staking.erc20TokenBalance(address),
-    queryFn: async (): Promise<number> => {
-      if (!address) return 0;
-      return await getERC20TokenBalance(address);
+export function useERC20TokenBalance() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
+  // Get token address
+  const { data: tokenAddress } = useQuery({
+    queryKey: queryKeys.staking.erc20TokenAddress,
+    queryFn: async () => {
+      return await getERC20TokenAddress();
     },
-    enabled: !!address,
-    refetchInterval: 10000, // refetch every 10 seconds
+    refetchInterval: 60000, // refetch every minute
   });
+
+  // Get ERC20 token balance using useWalletBalance
+  const {
+    data: balanceData,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  } = useWalletBalance(
+    {
+      chain: chain1,
+      address: address,
+      client,
+      tokenAddress: tokenAddress,
+    },
+    {
+      enabled: !!address && !!tokenAddress,
+      refetchInterval: 10000,
+    }
+  );
+
+  return {
+    data: Number(balanceData?.value || 0),
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  };
+}
+
+// Get bond token balances for a user (STOKEN and SNATIVE)
+export function useBondTokenBalances() {
+  const { account } = useUserChainInfo();
+  const address = account?.address;
+
+  // Get token addresses
+  const { data: stokenAddress } = useQuery({
+    queryKey: queryKeys.staking.stakingTokenAddress,
+    queryFn: async () => {
+      return await getStakingTokenAddress();
+    },
+    refetchInterval: 60000, // refetch every minute
+  });
+
+  const { data: snativeAddress } = useQuery({
+    queryKey: queryKeys.staking.nativeStakingTokenAddress,
+    queryFn: async () => {
+      return await getNativeStakingTokenAddress();
+    },
+    refetchInterval: 60000, // refetch every minute
+  });
+
+  // Get STOKEN balance using useWalletBalance
+  const {
+    data: stokenBalanceData,
+    isLoading: isStokenLoading,
+    isError: isStokenError,
+  } = useWalletBalance(
+    {
+      chain: chain1,
+      address: address,
+      client,
+      tokenAddress: stokenAddress,
+    },
+    {
+      enabled: !!address && !!stokenAddress,
+      refetchInterval: 10000,
+    }
+  );
+
+  // Get SNATIVE balance using useWalletBalance
+  const {
+    data: snativeBalanceData,
+    isLoading: isSnativeLoading,
+    isError: isSnativeError,
+  } = useWalletBalance(
+    {
+      chain: chain1,
+      address: address,
+      client,
+      tokenAddress: snativeAddress,
+    },
+    {
+      enabled: !!address && !!snativeAddress,
+      refetchInterval: 10000,
+    }
+  );
+
+  return {
+    data: {
+      stokenBalance: Number(stokenBalanceData?.value || 0),
+      snativeBalance: Number(snativeBalanceData?.value || 0),
+    },
+    isLoading: isStokenLoading || isSnativeLoading,
+    isError: isStokenError || isSnativeError,
+  };
 }
 
 // Get staking statistics
@@ -277,8 +418,12 @@ export function useStakingStats() {
         };
       }
 
+      console.log({ userPositions });
+
       const totalPositions = userPositions?.length || 0;
       const totalNativePositions = userNativePositions?.length || 0;
+
+      console.log({ totalPositions, totalNativePositions });
 
       const averageStakeAmount =
         contractState.totalStaked > 0
@@ -298,6 +443,6 @@ export function useStakingStats() {
       };
     },
     enabled: !!contractState,
-    refetchInterval: 30000, // refetch every 30 seconds
+    refetchInterval: 5000, // refetch every 30 seconds
   });
 }

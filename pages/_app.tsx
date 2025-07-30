@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import { RootLayout } from "@/modules/app/layout";
+import { ErrorBoundary } from "@/modules/components/ErrorBoundary";
 
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -14,6 +15,7 @@ type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -25,17 +27,19 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout ?? ((page) => <RootLayout>{page}</RootLayout>);
 
   return (
-    <ThirdwebProvider>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          :root {
-            --font-inter: ${inter.style.fontFamily};
-            --font-inter: ${inter.style.fontFamily};
-            }`,
-        }}
-      />
-      <QueryProvider>{getLayout(<Component {...pageProps} />)}</QueryProvider>
-    </ThirdwebProvider>
+    <ErrorBoundary>
+      <ThirdwebProvider>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+            :root {
+              --font-inter: ${inter.style.fontFamily};
+              --font-inter: ${inter.style.fontFamily};
+              }`,
+          }}
+        />
+        <QueryProvider>{getLayout(<Component {...pageProps} />)}</QueryProvider>
+      </ThirdwebProvider>
+    </ErrorBoundary>
   );
 }

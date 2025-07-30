@@ -15,12 +15,15 @@ export {
   useERC20TokenInfo,
   useStakingTokenInfo,
   useEpochInfo,
+  useNextEpochTime,
+  useTimeUntilNextEpoch,
   useFeeInfo,
   useContractState,
   useUserInfoERC20,
   useUserInfoNative,
   useStakingStats,
   useERC20TokenBalance,
+  useBondTokenBalances,
 } from "./staking/staking.query";
 export * from "./staking/staking.types";
 export * from "./staking/staking.contract";

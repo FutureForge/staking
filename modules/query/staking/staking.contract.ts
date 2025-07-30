@@ -176,24 +176,6 @@ export async function getERC20TokenAddress(): Promise<string> {
   return tokenAddress as string;
 }
 
-export async function getERC20TokenBalance(address: string): Promise<number> {
-  const tokenAddress = await getERC20TokenAddress();
-  
-  const tokenContract = getContractCustom({
-    contractAddress: tokenAddress,
-    chain: chain1,
-    abi: TokenContract,
-  });
-  
-  const balance = await readContract({
-    contract: tokenContract,
-    method: "function balanceOf(address) view returns (uint256)",
-    params: [address],
-  });
-  
-  return Number(balance);
-}
-
 export async function getStakingTokenAddress(): Promise<string> {
   const stokenAddress = await readContract({
     contract: stakingContract,
@@ -261,6 +243,23 @@ export async function getEpochInfo(): Promise<{
     nativeRewardPerEpoch: Number(nativeRewardPerEpoch),
     epochLength: Number(epochLength),
   };
+}
+
+// Helper function to get next epoch time
+export async function getNextEpochTime(): Promise<Date> {
+  const epochInfo = await getEpochInfo();
+  // Add EPOCH_LENGTH to the current epochEnd to get the next epoch time
+  const nextEpochTime = epochInfo.epochEnd + epochInfo.epochLength;
+  return new Date(nextEpochTime * 1000); // Convert seconds to milliseconds for JavaScript Date
+}
+
+// Helper function to get time until next epoch
+export async function getTimeUntilNextEpoch(): Promise<number> {
+  const epochInfo = await getEpochInfo();
+  const now = Math.floor(Date.now() / 1000);
+  const nextEpochTime = epochInfo.epochEnd + epochInfo.epochLength;
+  const timeLeft = nextEpochTime - now;
+  return timeLeft > 0 ? timeLeft : 0;
 }
 
 // Fee info related contract calls

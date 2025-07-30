@@ -29,11 +29,17 @@ export const queryKeys = {
     // Contract parameters
     fees: ["staking", "fees"] as const,
     epochInfo: ["staking", "epochInfo"] as const,
+    nextEpochTime: ["staking", "nextEpochTime"] as const,
+    timeUntilNextEpoch: ["staking", "timeUntilNextEpoch"] as const,
     
     // Token info
     erc20TokenInfo: ["staking", "erc20TokenInfo"] as const,
     stakingTokenInfo: ["staking", "stakingTokenInfo"] as const,
     erc20TokenBalance: (address?: string) => ["staking", "erc20TokenBalance", address] as const,
+    bondTokenBalances: (address?: string) => ["staking", "bondTokenBalances", address] as const,
+    stakingTokenAddress: ["staking", "stakingTokenAddress"] as const,
+    nativeStakingTokenAddress: ["staking", "nativeStakingTokenAddress"] as const,
+    erc20TokenAddress: ["staking", "erc20TokenAddress"] as const,
     
     // Statistics
     stats: ["staking", "stats"] as const,

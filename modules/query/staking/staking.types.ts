@@ -68,3 +68,8 @@ export interface StakingStats {
   averageStakeAmount: number;
   averageNativeStakeAmount: number;
 }
+
+export interface BondTokenBalances {
+  stokenBalance: number;
+  snativeBalance: number;
+}

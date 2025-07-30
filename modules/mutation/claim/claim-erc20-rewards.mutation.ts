@@ -22,18 +22,26 @@ export function useClaimERC20RewardsMutation() {
         params: [],
       });
 
-      const transactionReceipt = await sendAndConfirmTransaction({
-        account,
-        transaction,
-      });
+      try {
+        const transactionReceipt = await sendAndConfirmTransaction({
+          account,
+          transaction,
+        });
 
-      if (transactionReceipt.status === "reverted") {
-        throw new Error("Failed to claim ERC20 rewards");
+        if (transactionReceipt.status === "reverted") {
+          throw new Error("Failed to claim ERC20 rewards");
+        }
+
+        return {
+          transactionHash: transactionReceipt.transactionHash,
+        };
+      } catch (error) {
+        // Handle transaction revert errors
+        if (error instanceof Error && error.message.includes("execution reverted")) {
+          throw new Error("Transaction failed: No rewards available to claim");
+        }
+        throw error;
       }
-
-      return {
-        transactionHash: transactionReceipt.transactionHash,
-      };
     },
     meta: {
       loadingMessage: {

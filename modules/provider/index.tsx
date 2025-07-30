@@ -11,6 +11,10 @@ type QueryProviderProps = {
   children: ReactNode;
 };
 
+type MutationContext = {
+  loadingToastId?: string | number;
+};
+
 export function QueryProvider({ children }: QueryProviderProps) {
   const toast = useToast();
 
@@ -19,7 +23,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
       new QueryClient({
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
-          onMutate: (variables, mutation) => {
+          onMutate: (variables, mutation): MutationContext => {
             console.log("query provider onMutate called");
 
             const loadingMessage = mutation?.meta?.loadingMessage as {
@@ -27,26 +31,37 @@ export function QueryProvider({ children }: QueryProviderProps) {
               description: string;
             };
 
+            let loadingToastId: string | number;
+
             if (loadingMessage) {
-              toast.loading(loadingMessage.description, {
+              loadingToastId = toast.loading(loadingMessage.description, {
                 title: loadingMessage.title || "Processing...",
                 duration: Infinity,
               });
             } else {
-              toast.loading("Processing transaction...", {
+              loadingToastId = toast.loading("Processing transaction...", {
                 title: "Processing",
                 duration: Infinity,
               });
             }
+
+            // Store the loading toast ID in the mutation context
+            return { loadingToastId };
           },
-          onSuccess: (_data, _variables, _context, mutation) => {
+          onSuccess: (_data, _variables, context, mutation) => {
             console.log(
               "query provider success",
               _data,
               _variables,
-              _context,
+              context,
               mutation
             );
+
+            // Dismiss the loading toast
+            const mutationContext = context as MutationContext;
+            if (mutationContext?.loadingToastId) {
+              toast.dismiss(mutationContext.loadingToastId);
+            }
 
             const successMessage = mutation?.meta?.successMessage as {
               title?: string;
@@ -65,8 +80,14 @@ export function QueryProvider({ children }: QueryProviderProps) {
               });
             }
           },
-          onError: (error, _variables, _context, mutation) => {
+          onError: (error, _variables, context, mutation) => {
             console.log("query provider error: ", error);
+
+            // Dismiss the loading toast
+            const mutationContext = context as MutationContext;
+            if (mutationContext?.loadingToastId) {
+              toast.dismiss(mutationContext.loadingToastId);
+            }
 
             const errorMessage = mutation?.meta?.errorMessage as {
               title?: string;
