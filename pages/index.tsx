@@ -19,10 +19,10 @@ export default function Home() {
       className={`${geistSans.variable} ${geistMono.variable} font-sans dark min-h-screen bg-black`}
     >
       <Head>
-        <title>Stake X - Defi Staking Platform on CrossFi</title>
+        <title>STAKEX - DeFi Staking Platform on CrossFi</title>
         <meta
           name="description"
-          content="A modern staking dashboard for managing your crypto assets."
+          content="A modern DeFi staking platform for managing your XFI crypto assets."
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>

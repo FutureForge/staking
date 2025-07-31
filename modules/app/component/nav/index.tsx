@@ -68,10 +68,10 @@ export function Nav() {
       <div className="lg:w-1/3 w-1/2 flex items-center">
         <div className="text-white">
           <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent drop-shadow-lg">
-            Staking Dashboard
+            STAKEX
           </h1>
           <p className="text-purple-200 text-sm lg:text-base mt-1 drop-shadow-sm hidden sm:block">
-            Manage your staking positions and rewards
+            DeFi Staking Platform for XFI
           </p>
         </div>
       </div>
