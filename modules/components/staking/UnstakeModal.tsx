@@ -265,7 +265,7 @@ function PositionCard({
 
   const isUnlocked =
     position.plan === "DYNAMIC" || Date.now() / 1000 >= position.unlockTime;
-  const multiplier = position.multiplierBps / 100;
+  const multiplier = (position.multiplierBps / 10000).toFixed(1); // BPS_DENOM = 10,000
 
   return (
     <div

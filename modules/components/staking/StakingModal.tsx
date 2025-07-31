@@ -28,25 +28,25 @@ const durationOptions: DurationOption[] = [
   {
     value: "30days",
     label: "30 Days",
-    multiplier: "1.2x",
+    multiplier: "1.1x (11,000 BPS)",
     description: "30-day lock period",
   },
   {
     value: "90days",
     label: "90 Days",
-    multiplier: "1.5x",
+    multiplier: "1.2x (12,000 BPS)",
     description: "90-day lock period",
   },
   {
     value: "180days",
     label: "180 Days",
-    multiplier: "2.0x",
+    multiplier: "1.5x (15,000 BPS)",
     description: "180-day lock period",
   },
   {
     value: "365days",
     label: "365 Days",
-    multiplier: "2.0x",
+    multiplier: "2.0x (20,000 BPS)",
     description: "365-day lock period",
   },
 ];
@@ -71,6 +71,7 @@ export function StakingModal({
     useERC20TokenBalance();
   const { data: erc20Symbol } = useERC20TokenSymbol();
   const { data: nativeSymbol } = useNativeStakingTokenSymbol();
+
   const stakeMutation = useStakeMutation();
 
   const [amount, setAmount] = useState("");
@@ -84,17 +85,21 @@ export function StakingModal({
       ? (erc20Balance / 1e18).toFixed(3)
       : "0";
 
-  const tokenSymbol = stakeType === "native" ? (nativeSymbol || "XFI") : (erc20Symbol || "XFI");
+  const tokenSymbol =
+    stakeType === "native" ? nativeSymbol || "XFI" : erc20Symbol || "XFI";
 
   const isLoading =
     stakeType === "native" ? isNativeBalanceLoading : isERC20BalanceLoading;
 
   const isProcessing = stakeMutation.isPending;
 
-  const handleStake = () => {
+  // Check if user has insufficient balance
+  const hasInsufficientBalance = amount && parseFloat(amount) > parseFloat(userBalance);
+
+  const handleStake = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
 
-    stakeMutation.mutate(
+    await stakeMutation.mutate(
       {
         amount: parseFloat(amount),
         duration: selectedDuration,
@@ -125,12 +130,19 @@ export function StakingModal({
     <ErrorBoundary
       fallback={
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+          />
           <div className="relative bg-gradient-to-br from-purple-900/95 to-indigo-900/95 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-md mx-4 p-6">
             <div className="text-center">
               <div className="text-4xl mb-4">⚠️</div>
-              <h3 className="text-lg font-bold text-white mb-2">Something went wrong</h3>
-              <p className="text-purple-200 mb-4">Please try again or close the modal.</p>
+              <h3 className="text-lg font-bold text-white mb-2">
+                Something went wrong
+              </h3>
+              <p className="text-purple-200 mb-4">
+                Please try again or close the modal.
+              </p>
               <button
                 onClick={onClose}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg"
@@ -170,7 +182,9 @@ export function StakingModal({
             {/* Balance Display */}
             <div className="bg-white/5 rounded-lg p-4 border border-white/10">
               <div className="flex justify-between items-center">
-                <span className="text-purple-200 text-sm">Available Balance</span>
+                <span className="text-purple-200 text-sm">
+                  Available Balance
+                </span>
                 <span className="text-white font-semibold">
                   {isLoading ? "Loading..." : `${userBalance} ${tokenSymbol}`}
                 </span>
@@ -242,6 +256,7 @@ export function StakingModal({
                 disabled={
                   !amount ||
                   parseFloat(amount) <= 0 ||
+                  hasInsufficientBalance ||
                   isProcessing ||
                   stakeMutation.isPending
                 }
@@ -249,6 +264,7 @@ export function StakingModal({
                   "w-full py-3 px-4 rounded-lg font-medium transition-all duration-300",
                   !amount ||
                     parseFloat(amount) <= 0 ||
+                    hasInsufficientBalance ||
                     isProcessing ||
                     stakeMutation.isPending
                     ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
@@ -257,6 +273,8 @@ export function StakingModal({
               >
                 {isProcessing || stakeMutation.isPending
                   ? "Processing..."
+                  : hasInsufficientBalance
+                  ? "Insufficient Balance"
                   : "Stake Tokens"}
               </button>
 
