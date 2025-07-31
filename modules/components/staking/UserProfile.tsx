@@ -15,6 +15,7 @@ import {
 import { StakingModal } from "./StakingModal";
 import { UnstakeModal } from "./UnstakeModal";
 import { IS_TESTNET } from "@/utils/configs";
+import { toEther, toTokens } from "thirdweb";
 
 export function UserProfile() {
   const { account } = useUserChainInfo();
@@ -37,12 +38,19 @@ export function UserProfile() {
   const { data: bondTokenBalances, isLoading: isBondTokenBalancesLoading } =
     useBondTokenBalances();
 
+  console.log({
+    erc20Positions,
+    nativePositions,
+    pendingRewards,
+    userInfoERC20,
+    userInfoNative,
+    bondTokenBalances,
+  });
+
+  console.log('getting', {userInfoNative})
+
   const claimERC20Mutation = useClaimERC20RewardsMutation();
   const claimNativeMutation = useClaimNativeRewardsMutation();
-
-  const formatTokenAmount = (amount: number) => {
-    return (amount / 1e18).toFixed(4);
-  };
 
   const formatNumber = (num: number) => {
     if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
@@ -137,7 +145,7 @@ export function UserProfile() {
             <p className="text-purple-200 text-sm">STOKEN Balance</p>
             <p className="text-white font-bold text-lg drop-shadow-sm">
               {bondTokenBalances
-                ? formatTokenAmount(bondTokenBalances.stokenBalance)
+                ? toTokens(BigInt(bondTokenBalances.stokenBalance), 18)
                 : "0"}
             </p>
           </div>
@@ -145,7 +153,7 @@ export function UserProfile() {
             <p className="text-purple-200 text-sm">SNATIVE Balance</p>
             <p className="text-white font-bold text-lg drop-shadow-sm">
               {bondTokenBalances
-                ? formatTokenAmount(bondTokenBalances.snativeBalance)
+                ? toEther(BigInt(bondTokenBalances.snativeBalance))
                 : "0"}
             </p>
           </div>
@@ -172,7 +180,7 @@ export function UserProfile() {
               <span className="text-green-100">ERC20 Rewards</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards
-                  ? formatTokenAmount(pendingRewards.erc20Rewards)
+                  ? toTokens(BigInt(pendingRewards.erc20Rewards), 18)
                   : "0"}{" "}
                 XFI
               </span>
@@ -181,12 +189,12 @@ export function UserProfile() {
               <span className="text-green-100">Native Rewards</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards
-                  ? formatTokenAmount(pendingRewards.nativeRewards)
+                  ? toEther(BigInt(pendingRewards.nativeRewards))
                   : "0"}{" "}
                 XFI
               </span>
             </div>
-            <div className="border-t border-green-400/30 pt-3 mt-3">
+            {/* <div className="border-t border-green-400/30 pt-3 mt-3">
               <div className="flex justify-between items-center">
                 <span className="text-green-100 font-semibold">Total</span>
                 <span className="font-bold text-xl drop-shadow-sm">
@@ -199,7 +207,7 @@ export function UserProfile() {
                   XFI
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
@@ -224,7 +232,7 @@ export function UserProfile() {
               <span className="text-blue-100">STOKEN Balance</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {bondTokenBalances
-                  ? formatTokenAmount(bondTokenBalances.stokenBalance)
+                  ? toTokens(BigInt(bondTokenBalances.stokenBalance), 18)
                   : "0"}{" "}
                 STOKEN
               </span>
@@ -233,17 +241,17 @@ export function UserProfile() {
               <span className="text-blue-100">SNATIVE Balance</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {bondTokenBalances
-                  ? formatTokenAmount(bondTokenBalances.snativeBalance)
+                  ? toEther(BigInt(bondTokenBalances.snativeBalance))
                   : "0"}{" "}
                 SNATIVE
               </span>
             </div>
             <div className="border-t border-blue-400/30 pt-3 mt-3">
               <div className="flex justify-between items-center">
-                <span className="text-blue-100 font-semibold">
+                {/* <span className="text-blue-100 font-semibold">
                   Total Bond Tokens
-                </span>
-                <span className="font-bold text-xl drop-shadow-sm">
+                </span> */}
+                {/* <span className="font-bold text-xl drop-shadow-sm">
                   {bondTokenBalances
                     ? formatTokenAmount(
                         bondTokenBalances.stokenBalance +
@@ -251,7 +259,7 @@ export function UserProfile() {
                       )
                     : "0"}{" "}
                   Tokens
-                </span>
+                </span> */}
               </div>
             </div>
           </div>

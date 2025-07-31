@@ -8,12 +8,23 @@ export function EpochInfo() {
 
   console.log({ epochInfo, feeInfo });
 
-  const formatTime = (timestamp: number) => {
+  const formatTimeUTC = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleString();
+    return date.toLocaleString('en-GB', {
+      timeZone: 'UTC',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
   };
 
   const formatDuration = (seconds: number) => {
+    if (seconds <= 0) return "0m";
+    
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -30,7 +41,17 @@ export function EpochInfo() {
     return timeLeft > 0 ? timeLeft : 0;
   };
 
+  const getEpochProgress = () => {
+    if (!epochInfo) return 0;
+    const now = Math.floor(Date.now() / 1000);
+    const epochStart = epochInfo.epochEnd - epochInfo.epochLength;
+    const elapsed = now - epochStart;
+    const progress = (elapsed / epochInfo.epochLength) * 100;
+    return Math.min(100, Math.max(0, progress));
+  };
+
   const timeUntilEpochEnd = getTimeUntilEpochEnd();
+  const epochProgress = getEpochProgress();
 
   const formatTokenAmount = (amount: number) => {
     return (amount / 1e18).toFixed(2);
@@ -64,14 +85,14 @@ export function EpochInfo() {
                 <p className="text-sm text-indigo-100">Start Time</p>
                 <p className="font-medium text-sm drop-shadow-sm">
                   {epochInfo
-                    ? formatTime(epochInfo.lastRewardTime)
+                    ? formatTimeUTC(epochInfo.epochEnd - epochInfo.epochLength)
                     : "Loading..."}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-indigo-100">End Time</p>
                 <p className="font-medium text-sm drop-shadow-sm">
-                  {epochInfo ? formatTime(epochInfo.epochEnd) : "Loading..."}
+                  {epochInfo ? formatTimeUTC(epochInfo.epochEnd) : "Loading..."}
                 </p>
               </div>
               <div>
@@ -134,7 +155,7 @@ export function EpochInfo() {
                 <p className="text-sm text-green-100">Start Time</p>
                 <p className="font-medium text-sm drop-shadow-sm">
                   {nextEpochTime
-                    ? nextEpochTime.toLocaleString()
+                    ? formatTimeUTC(Math.floor(nextEpochTime.getTime() / 1000))
                     : "Loading..."}
                 </p>
               </div>
@@ -223,27 +244,14 @@ export function EpochInfo() {
               Current Epoch Progress
             </span>
             <span className="text-sm text-white drop-shadow-sm">
-              {Math.floor(
-                ((epochInfo.epochEnd - epochInfo.lastRewardTime) /
-                  epochInfo.epochLength) *
-                  100
-              )}
-              %
+              {Math.floor(epochProgress)}%
             </span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2 shadow-inner">
             <div
               className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 shadow-lg"
               style={{
-                width: `${Math.min(
-                  100,
-                  Math.max(
-                    0,
-                    ((epochInfo.epochEnd - epochInfo.lastRewardTime) /
-                      epochInfo.epochLength) *
-                      100
-                  )
-                )}%`,
+                width: `${epochProgress}%`,
               }}
             ></div>
           </div>

@@ -42,6 +42,9 @@ import {
   getLastRewardTime,
   getPositions,
   getNativePositions,
+  getERC20TokenSymbol,
+  getStakingTokenSymbol,
+  getNativeStakingTokenSymbol,
 } from "./staking.contract";
 
 // Get pending ERC20 rewards for a user
@@ -50,7 +53,7 @@ export function usePendingRewardsERC20() {
   const address = account?.address;
 
   return useQuery({
-    queryKey: queryKeys.staking.pendingRewards(address),
+    queryKey: queryKeys.staking.pendingRewardsERC20(address),
     queryFn: async (): Promise<number> => {
       if (!address) return 0;
       return await getPendingRewardsERC20(address);
@@ -68,7 +71,7 @@ export function usePendingRewardsNative() {
   const { data: userNativePositions } = useUserNativePositions();
 
   return useQuery({
-    queryKey: queryKeys.staking.nativeUserInfo(address),
+    queryKey: queryKeys.staking.pendingRewardsNative(address),
     queryFn: async (): Promise<number> => {
       if (!address || !userNativePositions || userNativePositions.length === 0)
         return 0;
@@ -174,11 +177,12 @@ export function useERC20TokenInfo() {
     queryKey: queryKeys.staking.erc20TokenInfo,
     queryFn: async (): Promise<ERC20TokenInfo> => {
       const tokenAddress = await getERC20TokenAddress();
+      const tokenSymbol = await getERC20TokenSymbol();
 
       return {
         address: tokenAddress,
         name: "Staking Token", // This would need to be fetched from the actual token contract
-        symbol: "STK",
+        symbol: tokenSymbol,
         decimals: 18,
         totalSupply: 0, // This would need to be fetched from the actual token contract
         balance: 0, // This would need to be fetched separately for a specific address
@@ -197,13 +201,47 @@ export function useStakingTokenInfo() {
         getStakingTokenAddress(),
         getNativeStakingTokenAddress(),
       ]);
+      const stokenSymbol = await getStakingTokenSymbol();
 
       return {
         name: "Staked Tokens",
-        symbol: "STK",
+        symbol: stokenSymbol,
         totalSupply: 0, // This would need to be fetched from the actual token contract
         balance: 0, // This would need to be fetched separately for a specific address
       };
+    },
+    refetchInterval: 60000, // refetch every minute
+  });
+}
+
+// Get ERC20 token symbol
+export function useERC20TokenSymbol() {
+  return useQuery({
+    queryKey: queryKeys.staking.erc20TokenSymbol,
+    queryFn: async (): Promise<string> => {
+      return await getERC20TokenSymbol();
+    },
+    refetchInterval: 60000, // refetch every minute
+  });
+}
+
+// Get staking token symbol (for ERC20 staking)
+export function useStakingTokenSymbol() {
+  return useQuery({
+    queryKey: queryKeys.staking.stakingTokenSymbol,
+    queryFn: async (): Promise<string> => {
+      return await getStakingTokenSymbol();
+    },
+    refetchInterval: 60000, // refetch every minute
+  });
+}
+
+// Get native staking token symbol
+export function useNativeStakingTokenSymbol() {
+  return useQuery({
+    queryKey: queryKeys.staking.nativeStakingTokenSymbol,
+    queryFn: async (): Promise<string> => {
+      return await getNativeStakingTokenSymbol();
     },
     refetchInterval: 60000, // refetch every minute
   });
@@ -293,7 +331,7 @@ export function useUserInfoNative() {
       if (!address) {
         return { weight: 0, rewardDebt: 0 };
       }
-      return await getUserInfoNative(address);
+      return await getUserInfoNative(address!);
     },
     enabled: !!address,
     refetchInterval: 10000, // refetch every 10 seconds
@@ -319,45 +357,6 @@ export function usePendingRewards() {
     enabled: !!address,
     refetchInterval: 10000, // refetch every 10 seconds
   });
-}
-
-// Get ERC20 token balance for a user
-export function useERC20TokenBalance() {
-  const { account } = useUserChainInfo();
-  const address = account?.address;
-
-  // Get token address
-  const { data: tokenAddress } = useQuery({
-    queryKey: queryKeys.staking.erc20TokenAddress,
-    queryFn: async () => {
-      return await getERC20TokenAddress();
-    },
-    refetchInterval: 60000, // refetch every minute
-  });
-
-  // Get ERC20 token balance using useWalletBalance
-  const {
-    data: balanceData,
-    isLoading: isBalanceLoading,
-    isError: isBalanceError,
-  } = useWalletBalance(
-    {
-      chain: chain1,
-      address: address,
-      client,
-      tokenAddress: tokenAddress,
-    },
-    {
-      enabled: !!address && !!tokenAddress,
-      refetchInterval: 10000,
-    }
-  );
-
-  return {
-    data: Number(balanceData?.value || 0),
-    isLoading: isBalanceLoading,
-    isError: isBalanceError,
-  };
 }
 
 // Get staking statistics

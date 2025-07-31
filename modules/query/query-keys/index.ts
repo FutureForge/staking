@@ -7,7 +7,9 @@ export const queryKeys = {
     userPositions: (address?: string) => ["staking", "userPositions", address] as const,
     userNativePositions: (address?: string) => ["staking", "userNativePositions", address] as const,
     
-    // Rewards
+    // Rewards - made unique for each type
+    pendingRewardsERC20: (address?: string) => ["staking", "pendingRewardsERC20", address] as const,
+    pendingRewardsNative: (address?: string) => ["staking", "pendingRewardsNative", address] as const,
     pendingRewards: (address?: string) => ["staking", "pendingRewards", address] as const,
     claimableNativeRewards: (positionId?: number) => ["staking", "claimableNativeRewards", positionId] as const,
     
@@ -52,6 +54,11 @@ export const queryKeys = {
     erc20TokenAddress: ["staking", "erc20TokenAddress"] as const,
     stokenBalance: (address?: string) => ["staking", "stokenBalance", address] as const,
     snativeBalance: (address?: string) => ["staking", "snativeBalance", address] as const,
+    
+    // Token symbols
+    erc20TokenSymbol: ["staking", "erc20TokenSymbol"] as const,
+    stakingTokenSymbol: ["staking", "stakingTokenSymbol"] as const,
+    nativeStakingTokenSymbol: ["staking", "nativeStakingTokenSymbol"] as const,
     
     // Position arrays
     positions: (address?: string) => ["staking", "positions", address] as const,

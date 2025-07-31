@@ -4,6 +4,8 @@ import {
   useUserChainInfo,
   useUserNativeBalance,
   useERC20TokenBalance,
+  useERC20TokenSymbol,
+  useNativeStakingTokenSymbol,
 } from "@/modules/query";
 import { useStakeMutation } from "@/modules/mutation";
 import { cn } from "@/modules/app/utils";
@@ -67,6 +69,8 @@ export function StakingModal({
   } = useUserNativeBalance();
   const { data: erc20Balance, isLoading: isERC20BalanceLoading } =
     useERC20TokenBalance();
+  const { data: erc20Symbol } = useERC20TokenSymbol();
+  const { data: nativeSymbol } = useNativeStakingTokenSymbol();
   const stakeMutation = useStakeMutation();
 
   const [amount, setAmount] = useState("");
@@ -79,6 +83,8 @@ export function StakingModal({
       : erc20Balance
       ? (erc20Balance / 1e18).toFixed(3)
       : "0";
+
+  const tokenSymbol = stakeType === "native" ? (nativeSymbol || "XFI") : (erc20Symbol || "XFI");
 
   const isLoading =
     stakeType === "native" ? isNativeBalanceLoading : isERC20BalanceLoading;
@@ -148,7 +154,7 @@ export function StakingModal({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-purple-500/20">
             <h2 className="text-xl font-bold text-white">
-              Stake {stakeType === "native" ? "Native" : "ERC20"} Tokens
+              Stake {stakeType === "native" ? "Native" : "ERC20"} {tokenSymbol}
             </h2>
             <button
               onClick={onClose}
@@ -166,7 +172,7 @@ export function StakingModal({
               <div className="flex justify-between items-center">
                 <span className="text-purple-200 text-sm">Available Balance</span>
                 <span className="text-white font-semibold">
-                  {isLoading ? "Loading..." : `${userBalance} XFI`}
+                  {isLoading ? "Loading..." : `${userBalance} ${tokenSymbol}`}
                 </span>
               </div>
             </div>

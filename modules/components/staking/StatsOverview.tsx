@@ -1,27 +1,43 @@
-import { useContractState } from "@/modules/query";
+import { useContractState, useERC20TokenSymbol, useNativeStakingTokenSymbol } from "@/modules/query";
+import { useUserNativeBalance, useERC20TokenBalance } from "@/modules/query";
+import { toWei, toEther, toTokens } from "thirdweb";
 
 export function StatsOverview() {
   const { data: contractState, isLoading: isContractLoading } =
     useContractState();
+  const { balanceData: nativeBalance, isBalanceLoading: isNativeBalanceLoading } = useUserNativeBalance();
+  const { data: erc20Balance, isLoading: isERC20BalanceLoading } = useERC20TokenBalance();
+  const { data: erc20Symbol } = useERC20TokenSymbol();
+  const { data: nativeSymbol } = useNativeStakingTokenSymbol();
+  
   // const { data: stats, isLoading: isStatsLoading } = useStakingStats();
 
   // console.log({ stats, contractState });
 
-  const formatNumber = (num: number) => {
-    if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
-    if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
-    if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
-    return num.toLocaleString();
-  };
+  console.log({ contractState });
 
-  const formatTokenAmount = (amount: number) => {
-    return (amount / 1e18).toFixed(2);
+  const formatNumber = (num: number | string) => {
+    let numberValue = typeof num === "string" ? parseFloat(num) : num;
+    if (isNaN(numberValue)) return "0";
+    if (numberValue < 0) return "0";
+    if (numberValue === 0) return "0";
+    if (typeof numberValue !== "number") return "0";
+    if (numberValue === Infinity) return "∞";
+    if (numberValue === -Infinity) return "-∞";
+    if (typeof numberValue !== "number") return "0";
+
+    if (numberValue >= 1e9) return (numberValue / 1e9).toFixed(2) + "B";
+    if (numberValue >= 1e6) return (numberValue / 1e6).toFixed(2) + "M";
+    if (numberValue >= 1e3) return (numberValue / 1e3).toFixed(2) + "K";
+    return numberValue.toLocaleString();
   };
 
   const statsCards = [
     {
       title: "Total Staked (ERC20)",
-      value: contractState ? formatTokenAmount(contractState.totalStaked) : "0",
+      value: contractState
+        ? toTokens(BigInt(contractState.totalStaked), 18)
+        : "0",
       unit: "XFI",
       icon: "💰",
       color: "from-blue-500 to-blue-600",
@@ -31,7 +47,7 @@ export function StatsOverview() {
     {
       title: "Total Staked (Native)",
       value: contractState
-        ? formatTokenAmount(contractState.totalNativeStaked)
+        ? toEther(BigInt(contractState.totalNativeStaked))
         : "0",
       unit: "XFI",
       icon: "⚡",
@@ -116,14 +132,20 @@ export function StatsOverview() {
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Weight</span>
               <span className="text-white font-medium">
-                {contractState ? formatNumber(contractState.totalWeight) : "0"}
+                {contractState
+                  ? formatNumber(
+                      toTokens(BigInt(contractState.totalWeight), 18)
+                    )
+                  : "0"}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Native Weight</span>
               <span className="text-white font-medium">
                 {contractState
-                  ? formatNumber(contractState.totalNativeWeight)
+                  ? formatNumber(
+                      toEther(BigInt(contractState.totalNativeWeight))
+                    )
                   : "0"}
               </span>
             </div>
@@ -132,22 +154,22 @@ export function StatsOverview() {
 
         <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
           <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
-            Position Stats
+            Wallet Balance
           </h3>
-          {/* <div className="space-y-3">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">ERC20 Positions</span>
+              <span className="text-purple-200">ERC20 Balance</span>
               <span className="text-white font-medium">
-                {stats?.totalPositions || 0}
+                {isERC20BalanceLoading ? "Loading..." : `${(erc20Balance / 1e18).toFixed(3)} ${erc20Symbol || "XFI"}`}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Native Positions</span>
+              <span className="text-purple-200">Native Balance</span>
               <span className="text-white font-medium">
-                {stats?.totalNativePositions || 0}
+                {isNativeBalanceLoading ? "Loading..." : `${Number(nativeBalance?.displayValue || 0).toFixed(3)} ${nativeSymbol || "XFI"}`}
               </span>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

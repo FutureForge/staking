@@ -3,7 +3,7 @@ import {
   getContractCustom,
   getContractEthers,
 } from "@/modules/blockchain";
-import { readContract } from "thirdweb";
+import { readContract, toEther, toTokens } from "thirdweb";
 import { chain1, client, chain1StakingContract } from "@/utils/configs";
 import TokenContract from "@/modules/blockchain/abi/token.json";
 import StakingContract from "@/modules/blockchain/abi/staking.json";
@@ -135,8 +135,8 @@ export async function getUserInfoERC20(address: string): Promise<{
     const userInfo = await contract.userInfo(address);
 
     return {
-      weight: Number(userInfo.weight),
-      rewardDebt: Number(userInfo.rewardDebt),
+      weight: Number(toTokens(userInfo[0], 18)),
+      rewardDebt: Number(toTokens(userInfo[0], 18)),
     };
   } catch (error) {
     console.error(`Error fetching ERC20 user info for ${address}:`, error);
@@ -157,8 +157,8 @@ export async function getUserInfoNative(address: string): Promise<{
     const userInfo = await contract.nativeUserInfo(address);
 
     return {
-      weight: Number(userInfo.weight),
-      rewardDebt: Number(userInfo.rewardDebt),
+      weight: Number(toEther(userInfo[0])),
+      rewardDebt: Number(toEther(userInfo[1])),
     };
   } catch (error) {
     console.error(`Error fetching native user info for ${address}:`, error);
@@ -502,4 +502,55 @@ export async function getNativePositions(address: string): Promise<any[]> {
 
   const positions = await contract.getNativePositions(address);
   return positions;
+}
+
+// Get ERC20 token symbol
+export async function getERC20TokenSymbol(): Promise<string> {
+  try {
+    const tokenAddress = await getERC20TokenAddress();
+    const tokenContract = getContractEthers({
+      contractAddress: tokenAddress,
+      abi: TokenContract,
+    });
+
+    const symbol = await tokenContract.symbol();
+    return symbol;
+  } catch (error) {
+    console.error("Error fetching ERC20 token symbol:", error);
+    return "XFI"; // fallback
+  }
+}
+
+// Get staking token symbol (for ERC20 staking)
+export async function getStakingTokenSymbol(): Promise<string> {
+  try {
+    const stakingTokenAddress = await getStakingTokenAddress();
+    const stakingTokenContract = getContractEthers({
+      contractAddress: stakingTokenAddress,
+      abi: TokenContract,
+    });
+
+    const symbol = await stakingTokenContract.symbol();
+    return symbol;
+  } catch (error) {
+    console.error("Error fetching staking token symbol:", error);
+    return "sXFI"; // fallback
+  }
+}
+
+// Get native staking token symbol
+export async function getNativeStakingTokenSymbol(): Promise<string> {
+  try {
+    const nativeStakingTokenAddress = await getNativeStakingTokenAddress();
+    const nativeStakingTokenContract = getContractEthers({
+      contractAddress: nativeStakingTokenAddress,
+      abi: TokenContract,
+    });
+
+    const symbol = await nativeStakingTokenContract.symbol();
+    return symbol;
+  } catch (error) {
+    console.error("Error fetching native staking token symbol:", error);
+    return "sXFI"; // fallback
+  }
 }
