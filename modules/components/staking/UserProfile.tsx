@@ -38,17 +38,6 @@ export function UserProfile() {
   const { data: bondTokenBalances, isLoading: isBondTokenBalancesLoading } =
     useBondTokenBalances();
 
-  console.log({
-    erc20Positions,
-    nativePositions,
-    pendingRewards,
-    userInfoERC20,
-    userInfoNative,
-    bondTokenBalances,
-  });
-
-  console.log('getting', {userInfoNative})
-
   const claimERC20Mutation = useClaimERC20RewardsMutation();
   const claimNativeMutation = useClaimNativeRewardsMutation();
 

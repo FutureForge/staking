@@ -6,8 +6,6 @@ export function EpochInfo() {
   const { data: nextEpochTime, isLoading: isNextEpochLoading } = useNextEpochTime();
   const { data: timeUntilNextEpoch, isLoading: isTimeUntilNextEpochLoading } = useTimeUntilNextEpoch();
 
-  console.log({ epochInfo, feeInfo });
-
   const formatTimeUTC = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     return date.toLocaleString('en-GB', {

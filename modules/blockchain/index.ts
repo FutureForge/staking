@@ -1,4 +1,9 @@
-import { chain1, chain1StakingContract, client } from "@/utils/configs";
+import {
+  chain1,
+  chain1StakingContract,
+  chain1USDTContract,
+  client,
+} from "@/utils/configs";
 import { ethers } from "ethers";
 import {
   Hex,
@@ -8,6 +13,7 @@ import {
 } from "thirdweb";
 import StakingContract from "./abi/staking.json";
 import StakingTokenContract from "./abi/staking-token.json";
+import TokenContract from "./abi/token.json";
 
 export enum Chains {
   CROSSFI = "crossfi",
@@ -38,12 +44,18 @@ export function getChainInfoById(chainId: number) {
   throw new Error(`Unsupported chain: ${chainEntry.chain}`);
 }
 
-export function getContract({ type }: { type: "staking" | "staking-token" }) {
+export function getContract({
+  type,
+}: {
+  type: "staking" | "staking-token" | "token";
+}) {
   const contractAddress =
     type === "staking"
       ? chain1StakingContract
       : type === "staking-token"
       ? chain1StakingContract
+      : type === "token"
+      ? chain1USDTContract
       : null;
 
   if (!contractAddress) {
@@ -55,6 +67,8 @@ export function getContract({ type }: { type: "staking" | "staking-token" }) {
       ? StakingContract
       : type === "staking-token"
       ? StakingTokenContract
+      : type === "token"
+      ? TokenContract
       : null;
 
   if (!chainABI) {

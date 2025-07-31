@@ -73,7 +73,7 @@ export const chain1MainnetStakingContract = "";
 //   "0x86A6c0763f7F32500e5Dc10bFaa78Cc3300F8831";
 // export const chain1MainnetStakingTokenERC20Contract = "";
 
-export const chain1USDTContract = "0x1155e6977930b8C8439413e223b743Ec714D91EA";
+export const chain1USDTContract = "0x85c197De0dA144ABd8F46842734Ff770c5E9B911";
 
 // export const chain2TestnetBetContract =
 //   "0x08B38ef85FEBd41F7c05B5dbB6C02CAEc7650E9B";

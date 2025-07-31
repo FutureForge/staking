@@ -1,20 +1,22 @@
-import { useContractState, useERC20TokenSymbol, useNativeStakingTokenSymbol } from "@/modules/query";
+import {
+  useContractState,
+  useERC20TokenSymbol,
+  useNativeStakingTokenSymbol,
+} from "@/modules/query";
 import { useUserNativeBalance, useERC20TokenBalance } from "@/modules/query";
-import { toWei, toEther, toTokens } from "thirdweb";
+import { toEther, toTokens } from "thirdweb";
 
 export function StatsOverview() {
   const { data: contractState, isLoading: isContractLoading } =
     useContractState();
-  const { balanceData: nativeBalance, isBalanceLoading: isNativeBalanceLoading } = useUserNativeBalance();
-  const { data: erc20Balance, isLoading: isERC20BalanceLoading } = useERC20TokenBalance();
+  const {
+    balanceData: nativeBalance,
+    isBalanceLoading: isNativeBalanceLoading,
+  } = useUserNativeBalance();
+  const { data: erc20Balance, isLoading: isERC20BalanceLoading } =
+    useERC20TokenBalance();
   const { data: erc20Symbol } = useERC20TokenSymbol();
   const { data: nativeSymbol } = useNativeStakingTokenSymbol();
-  
-  // const { data: stats, isLoading: isStatsLoading } = useStakingStats();
-
-  // console.log({ stats, contractState });
-
-  console.log({ contractState });
 
   const formatNumber = (num: number | string) => {
     let numberValue = typeof num === "string" ? parseFloat(num) : num;
@@ -160,13 +162,21 @@ export function StatsOverview() {
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Balance</span>
               <span className="text-white font-medium">
-                {isERC20BalanceLoading ? "Loading..." : `${(erc20Balance / 1e18).toFixed(3)} ${erc20Symbol || "XFI"}`}
+                {isERC20BalanceLoading
+                  ? "Loading..."
+                  : `${(erc20Balance / 1e18).toFixed(3)} ${
+                      erc20Symbol || "XFI"
+                    }`}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Native Balance</span>
               <span className="text-white font-medium">
-                {isNativeBalanceLoading ? "Loading..." : `${Number(nativeBalance?.displayValue || 0).toFixed(3)} ${nativeSymbol || "XFI"}`}
+                {isNativeBalanceLoading
+                  ? "Loading..."
+                  : `${Number(nativeBalance?.displayValue || 0).toFixed(3)} ${
+                      nativeSymbol || "XFI"
+                    }`}
               </span>
             </div>
           </div>

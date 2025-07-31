@@ -37,10 +37,6 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
   const { data: nativePositions, isLoading: isNativeLoading } =
     useUserNativePositions();
 
-  // Debug logging
-  console.log("ERC20 Positions:", erc20Positions);
-  console.log("Native Positions:", nativePositions);
-
   // Check if user has any positions at all
   const hasAnyPositions =
     (erc20Positions && erc20Positions.length > 0) ||
@@ -284,7 +280,8 @@ function PositionCard({
     ...position,
   };
 
-  const isUnlocked = position.plan === "DYNAMIC" || Date.now() / 1000 >= position.unlockTime;
+  const isUnlocked =
+    position.plan === "DYNAMIC" || Date.now() / 1000 >= position.unlockTime;
   const multiplier = position.multiplierBps / 100;
 
   return (
@@ -341,10 +338,14 @@ function PositionCard({
         <div>
           <p className="text-white/70">Unlock Time</p>
           <p className="text-white font-medium">
-            {position.plan === "DYNAMIC" ? "No Lock" : formatDate(position.unlockTime)}
+            {position.plan === "DYNAMIC"
+              ? "No Lock"
+              : formatDate(position.unlockTime)}
           </p>
           <p className="text-white/50 text-xs">
-            {position.plan === "DYNAMIC" ? "Unstake anytime" : formatTime(position.unlockTime)}
+            {position.plan === "DYNAMIC"
+              ? "Unstake anytime"
+              : formatTime(position.unlockTime)}
           </p>
         </div>
       </div>

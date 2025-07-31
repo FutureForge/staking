@@ -2,10 +2,11 @@ import { getContract } from "@/modules/blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ethers } from "ethers";
-import StakingContractABI from "@/modules/blockchain/abi/staking.json";
-import StakingTokenContract from "@/modules/blockchain/abi/staking-token.json";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 import { queryKeys } from "@/modules/query/query-keys";
+import { chain1StakingContract } from "@/utils/configs";
+import { allowance } from "thirdweb/extensions/erc20";
+import { useApproveMutation } from "../approval/approval.mutation";
 
 // Helper function to convert duration string to seconds
 function getDurationInSeconds(duration: string): number {
@@ -31,6 +32,8 @@ export function useStakeMutation() {
   const { account } = useUserChainInfo();
   const queryClient = useQueryClient();
 
+  const approveMutation = useApproveMutation();
+
   return useMutation({
     mutationFn: async ({
       amount,
@@ -50,8 +53,6 @@ export function useStakeMutation() {
       // Convert duration string to seconds
       const durationInSeconds = getDurationInSeconds(duration);
 
-      console.log({ durationInSeconds, duration, amount });
-
       if (stakeType === "native") {
         const transaction = prepareContractCall({
           contract: stakingContract,
@@ -59,8 +60,6 @@ export function useStakeMutation() {
           params: [BigInt(durationInSeconds)],
           value: ethers.parseEther(amount.toString()),
         });
-
-        console.log({ account, transaction });
 
         try {
           const transactionReceipt = await sendAndConfirmTransaction({
@@ -92,6 +91,25 @@ export function useStakeMutation() {
           throw error;
         }
       } else if (stakeType === "erc20") {
+        const tokenContract = getContract({
+          type: "token",
+        });
+
+        const result = await allowance({
+          contract: tokenContract,
+          owner: account.address,
+          spender: chain1StakingContract,
+        });
+
+        if (result < ethers.parseEther(amount.toString())) {
+          // Wait for approval to complete before proceeding
+          await approveMutation.mutateAsync({
+            amount: amount,
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+        }
+
         const transaction = prepareContractCall({
           contract: stakingContract,
           method: "function stake(uint256 _amount, uint256 _duration)",
@@ -100,8 +118,6 @@ export function useStakeMutation() {
             BigInt(durationInSeconds),
           ],
         });
-
-        console.log({ transaction });
 
         try {
           const transactionReceipt = await sendAndConfirmTransaction({
@@ -120,7 +136,7 @@ export function useStakeMutation() {
             stakeType,
           };
         } catch (error) {
-          console.log({ error });
+          // console.log({ error });
           // Handle transaction revert errors
           if (
             error instanceof Error &&
