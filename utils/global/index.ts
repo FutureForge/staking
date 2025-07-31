@@ -1,5 +1,4 @@
-export // Helper function to get user-friendly error messages
-function getErrorMessage(error: any): string {
+export function getErrorMessage(error: any): string {
   const errorMessage =
     error?.message || error?.toString() || "An unknown error occurred";
 
@@ -73,3 +72,27 @@ function getErrorMessage(error: any): string {
   // Default case - return the original error message
   return errorMessage;
 }
+
+export const formatNumber = (num: number | string) => {
+  let numberValue = typeof num === "string" ? parseFloat(num) : num;
+  if (isNaN(numberValue)) return "0";
+  if (numberValue < 0) return "0";
+  if (numberValue === 0) return "0";
+  if (typeof numberValue !== "number") return "0";
+  if (numberValue === Infinity) return "∞";
+  if (numberValue === -Infinity) return "-∞";
+  if (typeof numberValue !== "number") return "0";
+
+  if (numberValue >= 1e9) return (numberValue / 1e9).toFixed(2) + "B";
+  if (numberValue >= 1e6) return (numberValue / 1e6).toFixed(2) + "M";
+  if (numberValue >= 1e3) return (numberValue / 1e3).toFixed(2) + "K";
+  return numberValue.toLocaleString();
+};
+
+export const formatDate = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleDateString();
+};
+
+export const formatTime = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleTimeString();
+};

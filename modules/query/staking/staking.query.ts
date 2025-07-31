@@ -45,6 +45,7 @@ import {
   getERC20TokenSymbol,
   getStakingTokenSymbol,
   getNativeStakingTokenSymbol,
+  getPendingRewardsNative,
 } from "./staking.contract";
 
 // Get pending ERC20 rewards for a user
@@ -68,31 +69,34 @@ export function usePendingRewardsNative() {
   const { account } = useUserChainInfo();
   const address = account?.address;
 
-  const { data: userNativePositions } = useUserNativePositions();
+  // const { data: userNativePositions } = useUserNativePositions();
 
   return useQuery({
     queryKey: queryKeys.staking.pendingRewardsNative(address),
     queryFn: async (): Promise<number> => {
-      if (!address || !userNativePositions || userNativePositions.length === 0)
-        return 0;
+      if (!address) return 0;
+      return await getPendingRewardsNative(address);
 
-      let totalPending = 0;
+      // if (!address || !userNativePositions || userNativePositions.length === 0)
+      //   return 0;
 
-      for (const positionId of userNativePositions) {
-        try {
-          const pending = await getClaimableNativeRewards(positionId);
-          totalPending += pending;
-        } catch (error) {
-          console.error(
-            `Error fetching native rewards for position ${positionId}:`,
-            error
-          );
-        }
-      }
+      // let totalPending = 0;
 
-      return totalPending;
+      // for (const positionId of userNativePositions) {
+      //   try {
+      //     const pending = await getClaimableNativeRewards(positionId);
+      //     totalPending += pending;
+      //   } catch (error) {
+      //     console.error(
+      //       `Error fetching native rewards for position ${positionId}:`,
+      //       error
+      //     );
+      //   }
+      // }
+
+      // return totalPending;
     },
-    enabled: !!address && !!userNativePositions,
+    enabled: !!address,
     refetchInterval: 10000, // refetch every 10 seconds
   });
 }

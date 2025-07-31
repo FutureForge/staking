@@ -143,8 +143,8 @@ export function useBondTokenBalances() {
 
   return {
     data: {
-      stokenBalance: Number(stokenBalanceData?.value || 0),
-      snativeBalance: Number(snativeBalanceData?.value || 0),
+      stokenBalance: Number(stokenBalanceData?.displayValue || 0),
+      snativeBalance: Number(snativeBalanceData?.displayValue || 0),
     },
     isLoading: isStokenLoading || isSnativeLoading,
     isError: isStokenError || isSnativeError,

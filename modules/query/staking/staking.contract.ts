@@ -20,6 +20,18 @@ export async function getPendingRewardsERC20(address: string): Promise<number> {
   return Number(pendingRewards);
 }
 
+export async function getPendingRewardsNative(
+  address: string
+): Promise<number> {
+  const pendingRewards = await readContract({
+    contract: stakingContract,
+    method:
+      "function pendingNativeRewards(address _user) view returns (uint256)",
+    params: [address],
+  });
+  return Number(pendingRewards);
+}
+
 export async function getClaimableNativeRewards(
   positionId: number
 ): Promise<number> {
@@ -75,7 +87,7 @@ export async function getPositionERC20(positionId: number): Promise<{
     const position = await contract.positions(positionId);
 
     return {
-      amount: Number(position.amount),
+      amount: Number(toTokens(position.amount, 18)),
       unlockTime: Number(position.unlockTime),
       multiplierBps: Number(position.multiplierBps),
       duration: Number(position.duration),
@@ -107,7 +119,7 @@ export async function getPositionNative(positionId: number): Promise<{
     const position = await contract.nativePositions(positionId);
 
     return {
-      amount: Number(position.amount),
+      amount: Number(toEther(position.amount)),
       unlockTime: Number(position.unlockTime),
       multiplierBps: Number(position.multiplierBps),
       duration: Number(position.duration),
@@ -136,7 +148,7 @@ export async function getUserInfoERC20(address: string): Promise<{
 
     return {
       weight: Number(toTokens(userInfo[0], 18)),
-      rewardDebt: Number(toTokens(userInfo[0], 18)),
+      rewardDebt: Number(toTokens(userInfo[1], 18)),
     };
   } catch (error) {
     console.error(`Error fetching ERC20 user info for ${address}:`, error);

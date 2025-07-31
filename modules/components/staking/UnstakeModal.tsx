@@ -7,6 +7,7 @@ import {
   usePositionNative,
 } from "@/modules/query";
 import { useUnstakeMutation } from "@/modules/mutation";
+import { formatDate, formatTime } from "@/utils/global";
 
 interface UnstakeModalProps {
   isOpen: boolean;
@@ -37,24 +38,14 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
   const { data: nativePositions, isLoading: isNativeLoading } =
     useUserNativePositions();
 
+  console.log({ erc20Positions, nativePositions });
+
   // Check if user has any positions at all
   const hasAnyPositions =
     (erc20Positions && erc20Positions.length > 0) ||
     (nativePositions && nativePositions.length > 0);
 
   const unstakeMutation = useUnstakeMutation();
-
-  const formatTokenAmount = (amount: number) => {
-    return (amount / 1e18).toFixed(4);
-  };
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString();
-  };
-
-  const formatTime = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleTimeString();
-  };
 
   const handleUnstake = () => {
     if (!selectedPosition) return;
@@ -143,9 +134,6 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
                       selectedPosition?.type === "erc20"
                     }
                     onSelect={(position) => setSelectedPosition(position)}
-                    formatTokenAmount={formatTokenAmount}
-                    formatDate={formatDate}
-                    formatTime={formatTime}
                   />
                 ))}
               </div>
@@ -184,9 +172,6 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
                       selectedPosition?.type === "native"
                     }
                     onSelect={(position) => setSelectedPosition(position)}
-                    formatTokenAmount={formatTokenAmount}
-                    formatDate={formatDate}
-                    formatTime={formatTime}
                   />
                 ))}
               </div>
@@ -233,9 +218,9 @@ interface PositionCardProps {
   usePositionQuery: (id: number) => any;
   isSelected: boolean;
   onSelect: (position: PositionWithDetails) => void;
-  formatTokenAmount: (amount: number) => string;
-  formatDate: (timestamp: number) => string;
-  formatTime: (timestamp: number) => string;
+  // formatTokenAmount: (amount: number) => string;
+  // formatDate: (timestamp: number) => string;
+  // formatTime: (timestamp: number) => string;
 }
 
 function PositionCard({
@@ -244,11 +229,9 @@ function PositionCard({
   usePositionQuery,
   isSelected,
   onSelect,
-  formatTokenAmount,
-  formatDate,
-  formatTime,
 }: PositionCardProps) {
   const { data: position, isLoading, isError } = usePositionQuery(positionId);
+  console.log({ position });
 
   if (isLoading) {
     return (
@@ -323,9 +306,7 @@ function PositionCard({
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-white/70">Amount</p>
-          <p className="text-white font-medium">
-            {formatTokenAmount(position.amount)} XFI
-          </p>
+          <p className="text-white font-medium">{position.amount} XFI</p>
         </div>
         <div>
           <p className="text-white/70">Multiplier</p>

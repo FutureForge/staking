@@ -4,6 +4,7 @@ import {
   useNativeStakingTokenSymbol,
 } from "@/modules/query";
 import { useUserNativeBalance, useERC20TokenBalance } from "@/modules/query";
+import { formatNumber } from "@/utils/global";
 import { toEther, toTokens } from "thirdweb";
 
 export function StatsOverview() {
@@ -18,29 +19,13 @@ export function StatsOverview() {
   const { data: erc20Symbol } = useERC20TokenSymbol();
   const { data: nativeSymbol } = useNativeStakingTokenSymbol();
 
-  const formatNumber = (num: number | string) => {
-    let numberValue = typeof num === "string" ? parseFloat(num) : num;
-    if (isNaN(numberValue)) return "0";
-    if (numberValue < 0) return "0";
-    if (numberValue === 0) return "0";
-    if (typeof numberValue !== "number") return "0";
-    if (numberValue === Infinity) return "∞";
-    if (numberValue === -Infinity) return "-∞";
-    if (typeof numberValue !== "number") return "0";
-
-    if (numberValue >= 1e9) return (numberValue / 1e9).toFixed(2) + "B";
-    if (numberValue >= 1e6) return (numberValue / 1e6).toFixed(2) + "M";
-    if (numberValue >= 1e3) return (numberValue / 1e3).toFixed(2) + "K";
-    return numberValue.toLocaleString();
-  };
-
   const statsCards = [
     {
       title: "Total Staked (ERC20)",
       value: contractState
-        ? toTokens(BigInt(contractState.totalStaked), 18)
+        ? formatNumber(toTokens(BigInt(contractState.totalStaked), 18))
         : "0",
-      unit: "XFI",
+      unit: "USDT",
       icon: "💰",
       color: "from-blue-500 to-blue-600",
       hoverColor: "from-blue-600 to-blue-700",
@@ -49,7 +34,7 @@ export function StatsOverview() {
     {
       title: "Total Staked (Native)",
       value: contractState
-        ? toEther(BigInt(contractState.totalNativeStaked))
+        ? formatNumber(toEther(BigInt(contractState.totalNativeStaked)))
         : "0",
       unit: "XFI",
       icon: "⚡",
@@ -164,8 +149,8 @@ export function StatsOverview() {
               <span className="text-white font-medium">
                 {isERC20BalanceLoading
                   ? "Loading..."
-                  : `${(erc20Balance / 1e18).toFixed(3)} ${
-                      erc20Symbol || "XFI"
+                  : `${formatNumber(toTokens(BigInt(erc20Balance), 18))} ${
+                      erc20Symbol || "USDT"
                     }`}
               </span>
             </div>
@@ -174,7 +159,7 @@ export function StatsOverview() {
               <span className="text-white font-medium">
                 {isNativeBalanceLoading
                   ? "Loading..."
-                  : `${Number(nativeBalance?.displayValue || 0).toFixed(3)} ${
+                  : `${formatNumber(nativeBalance?.displayValue || 0)} ${
                       nativeSymbol || "XFI"
                     }`}
               </span>
