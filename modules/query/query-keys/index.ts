@@ -26,11 +26,21 @@ export const queryKeys = {
     position: (id: number) => ["staking", "position", id] as const,
     nativePosition: (id: number) => ["staking", "nativePosition", id] as const,
     
+    // Position existence and ownership
+    positionExists: (id: number) => ["staking", "positionExists", id] as const,
+    nativePositionExists: (id: number) => ["staking", "nativePositionExists", id] as const,
+    positionOwner: (id: number) => ["staking", "positionOwner", id] as const,
+    nativePositionOwner: (id: number) => ["staking", "nativePositionOwner", id] as const,
+    
     // Contract parameters
     fees: ["staking", "fees"] as const,
     epochInfo: ["staking", "epochInfo"] as const,
     nextEpochTime: ["staking", "nextEpochTime"] as const,
     timeUntilNextEpoch: ["staking", "timeUntilNextEpoch"] as const,
+    fixedFeeByDuration: (duration: number) => ["staking", "fixedFeeByDuration", duration] as const,
+    bpsDenom: ["staking", "bpsDenom"] as const,
+    lastNativeRewardTime: ["staking", "lastNativeRewardTime"] as const,
+    lastRewardTime: ["staking", "lastRewardTime"] as const,
     
     // Token info
     erc20TokenInfo: ["staking", "erc20TokenInfo"] as const,
@@ -42,6 +52,10 @@ export const queryKeys = {
     erc20TokenAddress: ["staking", "erc20TokenAddress"] as const,
     stokenBalance: (address?: string) => ["staking", "stokenBalance", address] as const,
     snativeBalance: (address?: string) => ["staking", "snativeBalance", address] as const,
+    
+    // Position arrays
+    positions: (address?: string) => ["staking", "positions", address] as const,
+    nativePositions: (address?: string) => ["staking", "nativePositions", address] as const,
     
     // Statistics
     stats: ["staking", "stats"] as const,

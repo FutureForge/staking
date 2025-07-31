@@ -45,6 +45,7 @@ export interface FeeInfo {
   feeFixedEarly: number;
   recycleBps: number;
   accruedFees: number;
+  accruedNativeFees: number;
 }
 
 export interface ContractState {
@@ -54,8 +55,10 @@ export interface ContractState {
   totalNativeWeight: number;
   accRewardPerWeight: number;
   accNativeRewardPerWeight: number;
-  nativePositionIds: number;
-  currentPositionId: number;
+  // nativePositionIds: number;
+  // currentPositionId: number;
+  paused: boolean;
+  owner: string;
 }
 
 export interface PendingRewards {
@@ -64,8 +67,8 @@ export interface PendingRewards {
 }
 
 export interface StakingStats {
-  totalPositions: number;
-  totalNativePositions: number;
+  // totalPositions: number;
+  // totalNativePositions: number;
   averageStakeAmount: number;
   averageNativeStakeAmount: number;
 }

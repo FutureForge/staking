@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useUserChainInfo } from "@/modules/query";
 import {
+  useUserChainInfo,
   useUserPositionsERC20,
   useUserNativePositions,
   usePendingRewards,
@@ -130,7 +130,7 @@ export function UserProfile() {
             </p>
           </div>
         </div>
-        
+
         {/* Bond Token Stats */}
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
@@ -240,7 +240,9 @@ export function UserProfile() {
             </div>
             <div className="border-t border-blue-400/30 pt-3 mt-3">
               <div className="flex justify-between items-center">
-                <span className="text-blue-100 font-semibold">Total Bond Tokens</span>
+                <span className="text-blue-100 font-semibold">
+                  Total Bond Tokens
+                </span>
                 <span className="font-bold text-xl drop-shadow-sm">
                   {bondTokenBalances
                     ? formatTokenAmount(
@@ -334,7 +336,10 @@ export function UserProfile() {
           </button>
           <button
             onClick={() => setIsUnstakeModalOpen(true)}
-            disabled={(erc20Positions?.length || 0) + (nativePositions?.length || 0) === 0}
+            disabled={
+              (erc20Positions?.length || 0) + (nativePositions?.length || 0) ===
+              0
+            }
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
               (erc20Positions?.length || 0) + (nativePositions?.length || 0) > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"

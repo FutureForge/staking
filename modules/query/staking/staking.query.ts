@@ -32,6 +32,16 @@ import {
   getContractState,
   getNextEpochTime,
   getTimeUntilNextEpoch,
+  getPositionExists,
+  getNativePositionExists,
+  getPositionOwner,
+  getNativePositionOwner,
+  getFixedFeeByDuration,
+  getBPSDenom,
+  getLastNativeRewardTime,
+  getLastRewardTime,
+  getPositions,
+  getNativePositions,
 } from "./staking.contract";
 
 // Get pending ERC20 rewards for a user
@@ -350,112 +360,165 @@ export function useERC20TokenBalance() {
   };
 }
 
-// Get bond token balances for a user (STOKEN and SNATIVE)
-export function useBondTokenBalances() {
-  const { account } = useUserChainInfo();
-  const address = account?.address;
+// Get staking statistics
+// export function useStakingStats() {
+//   const { data: contractState } = useContractState();
 
-  // Get token addresses
-  const { data: stokenAddress } = useQuery({
-    queryKey: queryKeys.staking.stakingTokenAddress,
-    queryFn: async () => {
-      return await getStakingTokenAddress();
+//   return useQuery({
+//     queryKey: queryKeys.staking.stats,
+//     queryFn: async (): Promise<StakingStats> => {
+//       if (!contractState) {
+//         return {
+//           totalPositions: 0,
+//           totalNativePositions: 0,
+//           averageStakeAmount: 0,
+//           averageNativeStakeAmount: 0,
+//         };
+//       }
+
+//       // Use the correct position IDs for each type
+//       const totalPositions = contractState.currentPositionId - 1; // Current ID minus 1 gives us the highest assigned ID
+//       const totalNativePositions = contractState.nativePositionIds; // This is the highest native position ID
+
+//       const averageStakeAmount =
+//         contractState.totalStaked > 0
+//           ? contractState.totalStaked / Math.max(totalPositions, 1)
+//           : 0;
+
+//       const averageNativeStakeAmount =
+//         contractState.totalNativeStaked > 0
+//           ? contractState.totalNativeStaked / Math.max(totalNativePositions, 1)
+//           : 0;
+
+//       return {
+//         totalPositions,
+//         totalNativePositions,
+//         averageStakeAmount,
+//         averageNativeStakeAmount,
+//       };
+//     },
+//     enabled: !!contractState,
+//     refetchInterval: 5000, // refetch every 5 seconds
+//   });
+// }
+
+// New queries for the updated contract
+
+// Check if a position exists
+export function usePositionExists(positionId: number) {
+  return useQuery({
+    queryKey: queryKeys.staking.positionExists(positionId),
+    queryFn: async (): Promise<boolean> => {
+      return await getPositionExists(positionId);
     },
-    refetchInterval: 60000, // refetch every minute
+    enabled: positionId > 0,
+    refetchInterval: 30000,
   });
-
-  const { data: snativeAddress } = useQuery({
-    queryKey: queryKeys.staking.nativeStakingTokenAddress,
-    queryFn: async () => {
-      return await getNativeStakingTokenAddress();
-    },
-    refetchInterval: 60000, // refetch every minute
-  });
-
-  // Get STOKEN balance using useWalletBalance
-  const {
-    data: stokenBalanceData,
-    isLoading: isStokenLoading,
-    isError: isStokenError,
-  } = useWalletBalance(
-    {
-      chain: chain1,
-      address: address,
-      client,
-      tokenAddress: stokenAddress,
-    },
-    {
-      enabled: !!address && !!stokenAddress,
-      refetchInterval: 10000,
-    }
-  );
-
-  // Get SNATIVE balance using useWalletBalance
-  const {
-    data: snativeBalanceData,
-    isLoading: isSnativeLoading,
-    isError: isSnativeError,
-  } = useWalletBalance(
-    {
-      chain: chain1,
-      address: address,
-      client,
-      tokenAddress: snativeAddress,
-    },
-    {
-      enabled: !!address && !!snativeAddress,
-      refetchInterval: 10000,
-    }
-  );
-
-  return {
-    data: {
-      stokenBalance: Number(stokenBalanceData?.value || 0),
-      snativeBalance: Number(snativeBalanceData?.value || 0),
-    },
-    isLoading: isStokenLoading || isSnativeLoading,
-    isError: isStokenError || isSnativeError,
-  };
 }
 
-// Get staking statistics
-export function useStakingStats() {
-  const { data: contractState } = useContractState();
-
+// Check if a native position exists
+export function useNativePositionExists(positionId: number) {
   return useQuery({
-    queryKey: queryKeys.staking.stats,
-    queryFn: async (): Promise<StakingStats> => {
-      if (!contractState) {
-        return {
-          totalPositions: 0,
-          totalNativePositions: 0,
-          averageStakeAmount: 0,
-          averageNativeStakeAmount: 0,
-        };
-      }
-
-      // Use the correct position IDs for each type
-      const totalPositions = contractState.currentPositionId - 1; // Current ID minus 1 gives us the highest assigned ID
-      const totalNativePositions = contractState.nativePositionIds; // This is the highest native position ID
-
-      const averageStakeAmount =
-        contractState.totalStaked > 0
-          ? contractState.totalStaked / Math.max(totalPositions, 1)
-          : 0;
-
-      const averageNativeStakeAmount =
-        contractState.totalNativeStaked > 0
-          ? contractState.totalNativeStaked / Math.max(totalNativePositions, 1)
-          : 0;
-
-      return {
-        totalPositions,
-        totalNativePositions,
-        averageStakeAmount,
-        averageNativeStakeAmount,
-      };
+    queryKey: queryKeys.staking.nativePositionExists(positionId),
+    queryFn: async (): Promise<boolean> => {
+      return await getNativePositionExists(positionId);
     },
-    enabled: !!contractState,
-    refetchInterval: 5000, // refetch every 5 seconds
+    enabled: positionId > 0,
+    refetchInterval: 30000,
+  });
+}
+
+// Get position owner
+export function usePositionOwner(positionId: number) {
+  return useQuery({
+    queryKey: queryKeys.staking.positionOwner(positionId),
+    queryFn: async (): Promise<string> => {
+      return await getPositionOwner(positionId);
+    },
+    enabled: positionId > 0,
+    refetchInterval: 30000,
+  });
+}
+
+// Get native position owner
+export function useNativePositionOwner(positionId: number) {
+  return useQuery({
+    queryKey: queryKeys.staking.nativePositionOwner(positionId),
+    queryFn: async (): Promise<string> => {
+      return await getNativePositionOwner(positionId);
+    },
+    enabled: positionId > 0,
+    refetchInterval: 30000,
+  });
+}
+
+// Get fixed fee by duration
+export function useFixedFeeByDuration(duration: number) {
+  return useQuery({
+    queryKey: queryKeys.staking.fixedFeeByDuration(duration),
+    queryFn: async (): Promise<number> => {
+      return await getFixedFeeByDuration(duration);
+    },
+    enabled: duration > 0,
+    refetchInterval: 60000,
+  });
+}
+
+// Get BPS denominator
+export function useBPSDenom() {
+  return useQuery({
+    queryKey: queryKeys.staking.bpsDenom,
+    queryFn: async (): Promise<number> => {
+      return await getBPSDenom();
+    },
+    refetchInterval: 60000,
+  });
+}
+
+// Get last native reward time
+export function useLastNativeRewardTime() {
+  return useQuery({
+    queryKey: queryKeys.staking.lastNativeRewardTime,
+    queryFn: async (): Promise<number> => {
+      return await getLastNativeRewardTime();
+    },
+    refetchInterval: 30000,
+  });
+}
+
+// Get last reward time
+export function useLastRewardTime() {
+  return useQuery({
+    queryKey: queryKeys.staking.lastRewardTime,
+    queryFn: async (): Promise<number> => {
+      return await getLastRewardTime();
+    },
+    refetchInterval: 30000,
+  });
+}
+
+// Get all positions for a user (returns Position structs)
+export function usePositions(address: string) {
+  return useQuery({
+    queryKey: queryKeys.staking.positions(address),
+    queryFn: async (): Promise<any[]> => {
+      if (!address) return [];
+      return await getPositions(address);
+    },
+    enabled: !!address,
+    refetchInterval: 30000,
+  });
+}
+
+// Get all native positions for a user (returns Position structs)
+export function useNativePositions(address: string) {
+  return useQuery({
+    queryKey: queryKeys.staking.nativePositions(address),
+    queryFn: async (): Promise<any[]> => {
+      if (!address) return [];
+      return await getNativePositions(address);
+    },
+    enabled: !!address,
+    refetchInterval: 30000,
   });
 }

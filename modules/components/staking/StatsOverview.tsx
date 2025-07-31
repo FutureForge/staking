@@ -1,11 +1,11 @@
-import { useContractState, useStakingStats } from "@/modules/query";
+import { useContractState } from "@/modules/query";
 
 export function StatsOverview() {
   const { data: contractState, isLoading: isContractLoading } =
     useContractState();
-  const { data: stats, isLoading: isStatsLoading } = useStakingStats();
+  // const { data: stats, isLoading: isStatsLoading } = useStakingStats();
 
-  console.log({ stats, contractState });
+  // console.log({ stats, contractState });
 
   const formatNumber = (num: number) => {
     if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
@@ -39,26 +39,26 @@ export function StatsOverview() {
       hoverColor: "from-purple-600 to-purple-700",
       isLoading: isContractLoading,
     },
-    {
-      title: "Total Positions",
-      value: stats
-        ? (stats.totalPositions + stats.totalNativePositions).toString()
-        : "0",
-      unit: "Positions",
-      icon: "👥",
-      color: "from-green-500 to-green-600",
-      hoverColor: "from-green-600 to-green-700",
-      isLoading: isStatsLoading,
-    },
-    {
-      title: "Average Stake",
-      value: stats ? formatTokenAmount(stats.averageStakeAmount) : "0",
-      unit: "XFI",
-      icon: "📊",
-      color: "from-orange-500 to-orange-600",
-      hoverColor: "from-orange-600 to-orange-700",
-      isLoading: isStatsLoading,
-    },
+    // {
+    //   title: "Total Positions",
+    //   value: stats
+    //     ? (stats.totalPositions + stats.totalNativePositions).toString()
+    //     : "0",
+    //   unit: "Positions",
+    //   icon: "👥",
+    //   color: "from-green-500 to-green-600",
+    //   hoverColor: "from-green-600 to-green-700",
+    //   isLoading: isStatsLoading,
+    // },
+    // {
+    //   title: "Average Stake",
+    //   value: stats ? formatTokenAmount(stats.averageStakeAmount) : "0",
+    //   unit: "XFI",
+    //   icon: "📊",
+    //   color: "from-orange-500 to-orange-600",
+    //   hoverColor: "from-orange-600 to-orange-700",
+    //   isLoading: isStatsLoading,
+    // },
   ];
 
   return (
@@ -134,7 +134,7 @@ export function StatsOverview() {
           <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
             Position Stats
           </h3>
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Positions</span>
               <span className="text-white font-medium">
@@ -147,7 +147,7 @@ export function StatsOverview() {
                 {stats?.totalNativePositions || 0}
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ export * from './stake/stake.mutation'
 export * from './unstake/unstake.mutation'
 export * from './claim/claim-erc20-rewards.mutation'
 export * from './claim/claim-native-rewards.mutation'
+export * from './admin/admin.mutation'
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // syntax

@@ -62,6 +62,7 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     // Recycle fee parameters and accrued fees
     uint256 public recycleBps = 2_000; // recycle basis points
     uint256 public accuredFees; // accumulated fees from unstaking
+    uint256 public accuredNativeFees; // accumulated fees from unstaking
 
     // Fee parameters for unstaking
     uint256 public FEE_DYNAMIC = 500;
@@ -72,7 +73,6 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     // Position id trackers
     uint256 private _currentId = 1;
     uint256 private _nativeId = 1;
-    uint256 public nativePositionIds; // highest native position id issued
 
     // Mappings for positions and tracking owner addresses
     mapping(uint256 => Position) public positions; // ERC20 staking positions
@@ -155,7 +155,6 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         lastRewardTime = nowTs;
         lastNativeRewardTime = nowTs;
         epochEnd = nowTs;
-        nativePositionIds = 0;
 
         // Initialize fixed fee tiers (duration in seconds mapped to fee bps)
         fixedFeeByDuration[30 days] = 300;
@@ -181,17 +180,18 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         // If the epoch has ended, roll forward as many epochs as necessary.
         if (nowTime >= epochEnd && rewardPerEpoch != 0) {
             uint256 missedEpochs = (nowTime - epochEnd) / EPOCH_LENGTH + 1;
+            if (missedEpochs > 10) missedEpochs = 10;
             epochEnd += uint40(missedEpochs * EPOCH_LENGTH);
         }
         uint256 dt = nowTime - lastRewardTime;
-        if (dt != 0 && totalWeight != 0 && rewardPerEpoch != 0) {
+        if (dt != 0 && totalWeight > 100 && rewardPerEpoch != 0) {
             uint256 rate = uint256(rewardPerEpoch) / EPOCH_LENGTH;
-            // Scale by 1e18 for precision
             uint256 rewardAcc = dt * rate * 1e18;
             accRewardPerWeight += uint128(
                 (rewardAcc + totalWeight - 1) / totalWeight
             );
         }
+
         lastRewardTime = uint40(nowTime);
         _;
     }
@@ -201,10 +201,11 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         uint256 nowTime = block.timestamp;
         if (nowTime >= epochEnd && nativeRewardPerEpoch != 0) {
             uint256 missedEpochs = (nowTime - epochEnd) / EPOCH_LENGTH + 1;
+            if (missedEpochs > 10) missedEpochs = 10;
             epochEnd += uint40(missedEpochs * EPOCH_LENGTH);
         }
         uint256 dt = nowTime - lastNativeRewardTime;
-        if (dt != 0 && totalNativeWeight != 0 && nativeRewardPerEpoch != 0) {
+        if (dt != 0 && totalNativeWeight > 100 && nativeRewardPerEpoch != 0) {
             uint256 rate = uint256(nativeRewardPerEpoch) / EPOCH_LENGTH;
             uint256 rewardAcc = dt * rate * 1e18;
             accNativeRewardPerWeight += uint128(
@@ -334,13 +335,13 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         userInfo[msg.sender].weight -= uint128(weight);
         position.active = false;
 
+        STOKEN.burnByOwner(msg.sender, position.amount);
         // Remove from user's ERC20 positions array
         _removePositionId(_userPosition[msg.sender], _id);
         delete positionOwner[_id];
         delete positions[_id];
 
-        STOKEN.burnByOwner(msg.sender, position.amount);
-        uint256 recycle = (fee * recycleBps) / BPS_DENOM;
+        uint256 recycle = (fee * recycleBps + BPS_DENOM - 1) / BPS_DENOM;
         accuredFees += fee - recycle;
         _fundEpochFromFee(recycle);
 
@@ -373,8 +374,6 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         SNATIVE.mint(msg.sender, amount);
 
         uint256 id = _nativeId++;
-        // Update the highest native position id tracker
-        nativePositionIds = _nativeId - 1;
         uint40 unlock = _duration == 0
             ? 0
             : uint40(block.timestamp + _duration);
@@ -420,6 +419,8 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         if (nativePositionOwner[_id] != msg.sender) revert NotOwner();
         if (!position.active) revert InactivePosition();
 
+        if (address(this).balance < position.amount)
+            revert InsufficientBalance();
         uint256 feeBps;
         if (
             position.plan == Plan.DYNAMIC ||
@@ -440,14 +441,13 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         totalNativeStaked -= position.amount;
         position.active = false;
 
+        SNATIVE.burnByOwner(msg.sender, position.amount);
         _removePositionId(_userNativePositions[msg.sender], _id);
         delete nativePositionOwner[_id];
         delete nativePositions[_id];
 
-        SNATIVE.burnByOwner(msg.sender, position.amount);
-
-        uint256 recycle = (fee * recycleBps) / BPS_DENOM;
-        accuredFees += fee - recycle;
+        uint256 recycle = (fee * recycleBps + BPS_DENOM - 1) / BPS_DENOM;
+        accuredNativeFees += fee - recycle;
         _fundEpochFromNativeFee(recycle);
 
         (bool sent, ) = payable(msg.sender).call{value: out}("");
@@ -472,13 +472,40 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         userInfo[msg.sender].weight -= uint128(weight);
         position.active = false;
 
+        STOKEN.burnByOwner(msg.sender, amount);
         _removePositionId(_userPosition[msg.sender], _id);
         delete positionOwner[_id];
         delete positions[_id];
 
         if (!TOKEN.transfer(msg.sender, amount)) revert TransferFailed();
-        STOKEN.burnByOwner(msg.sender, amount);
         totalStaked -= amount;
+        emit EmergencyWithdraw(msg.sender, _id, amount);
+    }
+
+    function emergencyWithdrawNative(
+        uint256 _id
+    ) external nonReentrant whenPaused {
+        Position storage position = nativePositions[_id];
+        if (nativePositionOwner[_id] != msg.sender) revert NotOwner();
+        if (!position.active) revert InactivePosition();
+        if (address(this).balance < position.amount)
+            revert InsufficientBalance();
+
+        uint256 amount = position.amount;
+        uint256 weight = (uint256(position.amount) * position.multiplierBps) /
+            BPS_DENOM;
+        totalNativeWeight -= uint128(weight);
+        nativeUserInfo[msg.sender].weight -= uint128(weight);
+        position.active = false;
+
+        SNATIVE.burnByOwner(msg.sender, amount);
+        _removePositionId(_userNativePositions[msg.sender], _id);
+        delete nativePositionOwner[_id];
+        delete nativePositions[_id];
+
+        totalNativeStaked -= amount;
+        (bool sent, ) = payable(msg.sender).call{value: amount}("");
+        if (!sent) revert TransferFailed();
         emit EmergencyWithdraw(msg.sender, _id, amount);
     }
 
@@ -496,25 +523,6 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     /// @notice Get pending ERC20 rewards for a given user.
     /// @param _user Address of the user.
     /// @return pending Reward amount pending.
-    function pendingRewards(
-        address _user
-    ) external view returns (uint256 pending) {
-        UserInfo storage ui = userInfo[_user];
-        uint256 _accRewardPerWeight = accRewardPerWeight;
-        uint256 supply = totalWeight;
-        if (
-            block.timestamp > lastRewardTime &&
-            supply != 0 &&
-            rewardPerEpoch != 0
-        ) {
-            uint256 dt = block.timestamp - lastRewardTime;
-            uint256 rate = uint256(rewardPerEpoch) / EPOCH_LENGTH;
-            _accRewardPerWeight += (dt * rate * 1e18) / supply;
-        }
-        pending = (uint256(ui.weight) * _accRewardPerWeight) / 1e18;
-        if (pending > ui.rewardDebt) pending = pending - ui.rewardDebt;
-        else pending = 0;
-    }
 
     /// @notice Get pending native rewards for a given native staking position.
     /// @param positionId Native staking position ID.
@@ -595,6 +603,70 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         return _userNativePositions[_user];
     }
 
+    function positionExists(uint256 id) public view returns (bool) {
+        return positionOwner[id] != address(0);
+    }
+
+    function nativePositionExists(uint256 id) public view returns (bool) {
+        return nativePositionOwner[id] != address(0);
+    }
+
+    function getPositions(
+        address _user
+    ) external view returns (Position[] memory) {
+        uint256[] memory ids = _userPosition[_user];
+        Position[] memory data = new Position[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) {
+            data[i] = positions[ids[i]];
+        }
+        return data;
+    }
+
+    function getNativePositions(
+        address _user
+    ) external view returns (Position[] memory) {
+        uint256[] memory ids = _userNativePositions[_user];
+        Position[] memory data = new Position[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) {
+            data[i] = nativePositions[ids[i]];
+        }
+        return data;
+    }
+
+    function pendingRewards(address _user) external view returns (uint256) {
+        UserInfo storage ui = userInfo[_user];
+        uint256 acc = accRewardPerWeight;
+        uint256 supplyWeight = totalWeight;
+        if (
+            block.timestamp > lastRewardTime &&
+            supplyWeight != 0 &&
+            rewardPerEpoch != 0
+        ) {
+            uint256 dt = block.timestamp - lastRewardTime;
+            uint256 rate = uint256(rewardPerEpoch) / EPOCH_LENGTH;
+            acc += (dt * rate * 1e18) / supplyWeight;
+        }
+        return (uint256(ui.weight) * acc) / 1e18 - ui.rewardDebt;
+    }
+
+    function pendingNativeRewards(
+        address _user
+    ) external view returns (uint256) {
+        UserInfo storage ui = nativeUserInfo[_user];
+        uint256 acc = accNativeRewardPerWeight;
+        uint256 supplyWeight = totalNativeWeight;
+        if (
+            block.timestamp > lastNativeRewardTime &&
+            supplyWeight != 0 &&
+            nativeRewardPerEpoch != 0
+        ) {
+            uint256 dt = block.timestamp - lastNativeRewardTime;
+            uint256 rate = uint256(nativeRewardPerEpoch) / EPOCH_LENGTH;
+            acc += (dt * rate * 1e18) / supplyWeight;
+        }
+        return (uint256(ui.weight) * acc) / 1e18 - ui.rewardDebt;
+    }
+
     /// @notice Set the funding for the current ERC20 epoch.
     /// @param _reward Reward amount for the current epoch.
     function fundEpoch(
@@ -604,6 +676,22 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         if (!TOKEN.transferFrom(msg.sender, address(this), _reward))
             revert TransferFailed();
         rewardPerEpoch = uint128(_reward);
+        if (block.timestamp >= epochEnd) {
+            epochEnd = uint40(block.timestamp + EPOCH_LENGTH);
+        }
+        emit EpochFunded(_reward, epochEnd);
+    }
+
+    function fundNativeEpoch()
+        external
+        payable
+        nonReentrant
+        onlyOwner
+        updateGlobalNative
+    {
+        uint256 _reward = msg.value;
+        if (_reward == 0) revert ZeroAmount();
+        nativeRewardPerEpoch = uint128(_reward);
         if (block.timestamp >= epochEnd) {
             epochEnd = uint40(block.timestamp + EPOCH_LENGTH);
         }
@@ -620,6 +708,19 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
             revert InsufficientBalance();
         accuredFees -= _amount;
         if (!TOKEN.transfer(_to, _amount)) revert TransferFailed();
+        emit FeesCollected(_to, _amount);
+    }
+
+    function collectNativeFees(
+        address _to,
+        uint256 _amount
+    ) external onlyOwner {
+        if (_to == address(0)) revert NullAddress();
+        if (_amount > accuredNativeFees) _amount = accuredNativeFees;
+        if (address(this).balance < _amount) revert InsufficientBalance();
+        accuredNativeFees -= _amount;
+        (bool sent, ) = payable(_to).call{value: _amount}("");
+        if (!sent) revert TransferFailed();
         emit FeesCollected(_to, _amount);
     }
 
@@ -652,7 +753,7 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     /// @notice Set the recycle fee basis points.
     /// @param _bps New recycle BPS.
     function setRecycleBps(uint256 _bps) external onlyOwner {
-        if (_bps > 3_000) revert FeeTooHigh();
+        if (_bps > 3_000 || _bps < 500) revert FeeTooHigh();
         recycleBps = _bps;
         emit RecycleBpsChanged(_bps);
     }
@@ -662,6 +763,9 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     function setEpochLength(uint256 _length) external onlyOwner {
         if (_length < 1 hours || _length > 30 days) revert InvalidEpochLength();
         EPOCH_LENGTH = _length;
+        if (block.timestamp < epochEnd) {
+            epochEnd = uint40(block.timestamp + _length);
+        }
         emit EpochLengthUpdated(_length);
     }
 
@@ -682,14 +786,6 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     function unpause() external onlyOwner {
         _unpause();
         emit Paused(false);
-    }
-
-    // ─── VIEW FUNCTIONS ─────────────────────────────────────────────
-
-    /// @notice Get the current ERC20 position ID (next ID to be assigned).
-    /// @return The current ERC20 position ID.
-    function currentPositionId() external view returns (uint256) {
-        return _currentId;
     }
 
     // ─── INTERNAL FUNCTIONS ─────────────────────────────────────────────

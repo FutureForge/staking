@@ -46,9 +46,6 @@ export function useStakeMutation() {
       }
 
       const stakingContract = getContract({ type: "staking" });
-      const STAKING_CONTRACT_INTERFACE = new ethers.Interface(
-        StakingContractABI
-      );
 
       // Convert duration string to seconds
       const durationInSeconds = getDurationInSeconds(duration);
