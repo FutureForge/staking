@@ -58,31 +58,14 @@ export function UserProfile() {
     isUserInfoNativeLoading ||
     isBondTokenBalancesLoading;
 
-  const handleClaimAllRewards = async () => {
-    try {
-      // Claim both ERC20 and Native rewards
-      const promises = [];
+  const hasERC20RewardsToClaim =
+    pendingRewards && pendingRewards.erc20Rewards > 0;
 
-      if (pendingRewards && pendingRewards.erc20Rewards > 0) {
-        promises.push(claimERC20Mutation.mutate());
-      }
+  const hasNativeRewardsToClaim =
+    pendingRewards && pendingRewards.nativeRewards > 0;
 
-      if (pendingRewards && pendingRewards.nativeRewards > 0) {
-        promises.push(claimNativeMutation.mutate());
-      }
-
-      await Promise.all(promises);
-    } catch (error) {
-      console.error("Claim rewards error:", error);
-    }
-  };
-
-  const hasRewardsToClaim =
-    pendingRewards &&
-    (pendingRewards.erc20Rewards > 0 || pendingRewards.nativeRewards > 0);
-
-  const isClaiming =
-    claimERC20Mutation.isPending || claimNativeMutation.isPending;
+  const isClaimingERC20 = claimERC20Mutation.isPending;
+  const isClaimingNative = claimNativeMutation.isPending;
 
   if (!userAddress) {
     return (
@@ -360,15 +343,26 @@ export function UserProfile() {
             Unstake Positions
           </button>
           <button
-            onClick={handleClaimAllRewards}
-            disabled={!hasRewardsToClaim || isClaiming}
+            onClick={() => claimERC20Mutation.mutate()}
+            disabled={!hasERC20RewardsToClaim || isClaimingERC20}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
-              hasRewardsToClaim && !isClaiming
+              hasERC20RewardsToClaim && !isClaimingERC20
                 ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                 : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
             }`}
           >
-            {isClaiming ? "Claiming..." : "Claim All Rewards"}
+            {isClaimingERC20 ? "Claiming ERC20..." : "Claim ERC20 Rewards"}
+          </button>
+          <button
+            onClick={() => claimNativeMutation.mutate()}
+            disabled={!hasNativeRewardsToClaim || isClaimingNative}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+              hasNativeRewardsToClaim && !isClaimingNative
+                ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            {isClaimingNative ? "Claiming Native..." : "Claim Native Rewards"}
           </button>
         </div>
       </div>
