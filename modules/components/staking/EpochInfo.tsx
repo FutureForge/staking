@@ -59,10 +59,6 @@ export function EpochInfo() {
   const timeUntilEpochEnd = getTimeUntilEpochEnd();
   const epochProgress = getEpochProgress();
 
-  const formatTokenAmount = (amount: number) => {
-    return (amount / 1e18).toFixed(2);
-  };
-
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
       <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">

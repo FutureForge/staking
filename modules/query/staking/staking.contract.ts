@@ -260,8 +260,8 @@ export async function getEpochInfo(): Promise<{
 // Helper function to get next epoch time
 export async function getNextEpochTime(): Promise<Date> {
   const epochInfo = await getEpochInfo();
-  // Add EPOCH_LENGTH to the current epochEnd to get the next epoch time
-  const nextEpochTime = epochInfo.epochEnd + epochInfo.epochLength;
+  // Next epoch starts immediately after current epoch ends
+  const nextEpochTime = epochInfo.epochEnd;
   return new Date(nextEpochTime * 1000); // Convert seconds to milliseconds for JavaScript Date
 }
 
@@ -269,7 +269,7 @@ export async function getNextEpochTime(): Promise<Date> {
 export async function getTimeUntilNextEpoch(): Promise<number> {
   const epochInfo = await getEpochInfo();
   const now = Math.floor(Date.now() / 1000);
-  const nextEpochTime = epochInfo.epochEnd + epochInfo.epochLength;
+  const nextEpochTime = epochInfo.epochEnd;
   const timeLeft = nextEpochTime - now;
   return timeLeft > 0 ? timeLeft : 0;
 }
