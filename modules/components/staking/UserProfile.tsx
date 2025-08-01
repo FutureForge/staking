@@ -39,14 +39,14 @@ export function UserProfile() {
   const { data: bondTokenBalances, isLoading: isBondTokenBalancesLoading } =
     useBondTokenBalances();
 
-  // console.log({
-  //   erc20Positions,
-  //   nativePositions,
-  //   pendingRewards,
-  //   userInfoERC20,
-  //   userInfoNative,
-  //   bondTokenBalances,
-  // });
+  console.log({
+    // erc20Positions,
+    // nativePositions,
+    pendingRewards,
+    // userInfoERC20,
+    // userInfoNative,
+    // bondTokenBalances,
+  });
 
   const claimERC20Mutation = useClaimERC20RewardsMutation();
   const claimNativeMutation = useClaimNativeRewardsMutation();
@@ -179,16 +179,20 @@ export function UserProfile() {
               <span className="text-green-100">ERC20 Rewards</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards
-                  ? toTokens(BigInt(pendingRewards.erc20Rewards), 18)
+                  ? Number(
+                      toTokens(BigInt(pendingRewards.erc20Rewards), 18)
+                    ).toFixed(4)
                   : "0"}{" "}
-                XFI
+                USDT
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-green-100">Native Rewards</span>
               <span className="font-bold text-lg drop-shadow-sm">
                 {pendingRewards
-                  ? toEther(BigInt(pendingRewards.nativeRewards))
+                  ? Number(
+                      toEther(BigInt(pendingRewards.nativeRewards))
+                    ).toFixed(4)
                   : "0"}{" "}
                 XFI
               </span>

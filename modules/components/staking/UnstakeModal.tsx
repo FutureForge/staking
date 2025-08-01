@@ -6,7 +6,11 @@ import {
   usePositionERC20,
   usePositionNative,
 } from "@/modules/query";
-import { useUnstakeMutation } from "@/modules/mutation";
+import { 
+  useUnstakeMutation, 
+  useEmergencyWithdrawMutation, 
+  useEmergencyWithdrawNativeMutation 
+} from "@/modules/mutation";
 import { formatDate, formatTime } from "@/utils/global";
 
 interface UnstakeModalProps {
@@ -46,25 +50,62 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
     (nativePositions && nativePositions.length > 0);
 
   const unstakeMutation = useUnstakeMutation();
+  const emergencyWithdrawMutation = useEmergencyWithdrawMutation();
+  const emergencyWithdrawNativeMutation = useEmergencyWithdrawNativeMutation();
 
   const handleUnstake = () => {
     if (!selectedPosition) return;
 
-    unstakeMutation.mutate(
-      {
-        positionId: selectedPosition.id,
-        stakeType: selectedPosition.type,
-      },
-      {
-        onSuccess: () => {
-          onClose();
-          setSelectedPosition(null);
-        },
-        onError: () => {
-          // Error handling is done by the mutation
-        },
+    // Check if the position is unlocked (for FIXED plans)
+    const isUnlocked = selectedPosition.plan === "DYNAMIC" || Date.now() / 1000 >= selectedPosition.unlockTime;
+
+    // If the lock is not dynamic (FIXED plan) and still locked, use emergency withdraw
+    if (selectedPosition.plan === "FIXED" && !isUnlocked) {
+      if (selectedPosition.type === "native") {
+        emergencyWithdrawNativeMutation.mutate(
+          { id: selectedPosition.id },
+          {
+            onSuccess: () => {
+              onClose();
+              setSelectedPosition(null);
+            },
+            onError: () => {
+              // Error handling is done by the mutation
+            },
+          }
+        );
+      } else {
+        emergencyWithdrawMutation.mutate(
+          { id: selectedPosition.id },
+          {
+            onSuccess: () => {
+              onClose();
+              setSelectedPosition(null);
+            },
+            onError: () => {
+              // Error handling is done by the mutation
+            },
+          }
+        );
       }
-    );
+    } else {
+      // For dynamic plans or unlocked FIXED plans, use regular unstake
+      unstakeMutation.mutate(
+        {
+          positionId: selectedPosition.id,
+          stakeType: selectedPosition.type,
+        },
+        {
+          onSuccess: () => {
+            onClose();
+            setSelectedPosition(null);
+          },
+          onError: () => {
+            // Error handling is done by the mutation
+          },
+        }
+      );
+    }
   };
 
   const handleClose = () => {
@@ -197,14 +238,36 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
           </button>
           <button
             onClick={handleUnstake}
-            disabled={!selectedPosition || unstakeMutation.isPending}
+            disabled={
+              !selectedPosition || 
+              unstakeMutation.isPending || 
+              emergencyWithdrawMutation.isPending || 
+              emergencyWithdrawNativeMutation.isPending
+            }
             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-              selectedPosition && !unstakeMutation.isPending
+              selectedPosition && 
+              !unstakeMutation.isPending && 
+              !emergencyWithdrawMutation.isPending && 
+              !emergencyWithdrawNativeMutation.isPending
                 ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white transform hover:scale-105"
                 : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
             }`}
           >
-            {unstakeMutation.isPending ? "Unstaking..." : "Unstake Selected"}
+            {unstakeMutation.isPending || emergencyWithdrawMutation.isPending || emergencyWithdrawNativeMutation.isPending 
+              ? (() => {
+                  if (emergencyWithdrawMutation.isPending || emergencyWithdrawNativeMutation.isPending) {
+                    return "Emergency Withdrawing...";
+                  }
+                  return "Unstaking...";
+                })()
+              : (() => {
+                  if (selectedPosition?.plan === "FIXED") {
+                    const isUnlocked = Date.now() / 1000 >= selectedPosition.unlockTime;
+                    return isUnlocked ? "Unlock" : "Emergency Withdraw";
+                  }
+                  return "Unstake Selected";
+                })()
+            }
           </button>
         </div>
       </div>
@@ -334,6 +397,12 @@ function PositionCard({
       {!isUnlocked && position.plan !== "DYNAMIC" && (
         <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-300">
           ⚠️ This position is still locked. Early unstaking may incur penalties.
+        </div>
+      )}
+      
+      {isUnlocked && position.plan === "FIXED" && (
+        <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded text-xs text-green-300">
+          ✅ This position is now unlocked and ready for withdrawal.
         </div>
       )}
     </div>
