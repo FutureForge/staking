@@ -2,9 +2,13 @@ import {
   useContractState,
   useERC20TokenSymbol,
   useNativeStakingTokenSymbol,
+  useLastRewardTime,
+  useLastNativeRewardTime,
+  useEpochInfo,
+  useFeeInfo,
 } from "@/modules/query";
 import { useUserNativeBalance, useERC20TokenBalance } from "@/modules/query";
-import { formatNumber } from "@/utils/global";
+import { formatNumber, formatDate, formatTime } from "@/utils/global";
 import { toEther, toTokens } from "thirdweb";
 
 export function StatsOverview() {
@@ -18,6 +22,12 @@ export function StatsOverview() {
     useERC20TokenBalance();
   const { data: erc20Symbol } = useERC20TokenSymbol();
   const { data: nativeSymbol } = useNativeStakingTokenSymbol();
+  
+  // Additional contract data
+  const { data: lastRewardTime, isLoading: isLastRewardTimeLoading } = useLastRewardTime();
+  const { data: lastNativeRewardTime, isLoading: isLastNativeRewardTimeLoading } = useLastNativeRewardTime();
+  const { data: epochInfo, isLoading: isEpochInfoLoading } = useEpochInfo();
+  const { data: feeInfo, isLoading: isFeeInfoLoading } = useFeeInfo();
 
   const statsCards = [
     {
@@ -42,26 +52,72 @@ export function StatsOverview() {
       hoverColor: "from-purple-600 to-purple-700",
       isLoading: isContractLoading,
     },
-    // {
-    //   title: "Total Positions",
-    //   value: stats
-    //     ? (stats.totalPositions + stats.totalNativePositions).toString()
-    //     : "0",
-    //   unit: "Positions",
-    //   icon: "👥",
-    //   color: "from-green-500 to-green-600",
-    //   hoverColor: "from-green-600 to-green-700",
-    //   isLoading: isStatsLoading,
-    // },
-    // {
-    //   title: "Average Stake",
-    //   value: stats ? formatTokenAmount(stats.averageStakeAmount) : "0",
-    //   unit: "XFI",
-    //   icon: "📊",
-    //   color: "from-orange-500 to-orange-600",
-    //   hoverColor: "from-orange-600 to-orange-700",
-    //   isLoading: isStatsLoading,
-    // },
+    {
+      title: "Last ERC20 Reward",
+      value: lastRewardTime
+        ? formatDate(lastRewardTime)
+        : "Never",
+      unit: lastRewardTime ? formatTime(lastRewardTime) : "",
+      icon: "🕒",
+      color: "from-green-500 to-green-600",
+      hoverColor: "from-green-600 to-green-700",
+      isLoading: isLastRewardTimeLoading,
+    },
+    {
+      title: "Last Native Reward",
+      value: lastNativeRewardTime
+        ? formatDate(lastNativeRewardTime)
+        : "Never",
+      unit: lastNativeRewardTime ? formatTime(lastNativeRewardTime) : "",
+      icon: "⏰",
+      color: "from-orange-500 to-orange-600",
+      hoverColor: "from-orange-600 to-orange-700",
+      isLoading: isLastNativeRewardTimeLoading,
+    },
+    {
+      title: "ERC20 Reward/Epoch",
+      value: epochInfo
+        ? formatNumber(toTokens(BigInt(epochInfo.rewardPerEpoch), 18))
+        : "0",
+      unit: "USDT",
+      icon: "🎁",
+      color: "from-emerald-500 to-emerald-600",
+      hoverColor: "from-emerald-600 to-emerald-700",
+      isLoading: isEpochInfoLoading,
+    },
+    {
+      title: "Native Reward/Epoch",
+      value: epochInfo
+        ? formatNumber(toEther(BigInt(epochInfo.nativeRewardPerEpoch)))
+        : "0",
+      unit: "XFI",
+      icon: "🎯",
+      color: "from-cyan-500 to-cyan-600",
+      hoverColor: "from-cyan-600 to-cyan-700",
+      isLoading: isEpochInfoLoading,
+    },
+    {
+      title: "Accrued ERC20 Fees",
+      value: feeInfo
+        ? formatNumber(toTokens(BigInt(feeInfo.accruedFees), 18))
+        : "0",
+      unit: "USDT",
+      icon: "💸",
+      color: "from-red-500 to-red-600",
+      hoverColor: "from-red-600 to-red-700",
+      isLoading: isFeeInfoLoading,
+    },
+    {
+      title: "Accrued Native Fees",
+      value: feeInfo
+        ? formatNumber(toEther(BigInt(feeInfo.accruedNativeFees)))
+        : "0",
+      unit: "XFI",
+      icon: "💎",
+      color: "from-pink-500 to-pink-600",
+      hoverColor: "from-pink-600 to-pink-700",
+      isLoading: isFeeInfoLoading,
+    },
   ];
 
   return (
@@ -70,7 +126,7 @@ export function StatsOverview() {
         Platform Overview
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 lg:gap-6">
         {statsCards.map((card, index) => (
           <div
             key={index}
@@ -110,7 +166,7 @@ export function StatsOverview() {
       </div>
 
       {/* Additional Stats */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
           <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
             Weight Distribution
@@ -162,6 +218,40 @@ export function StatsOverview() {
                   : `${formatNumber(nativeBalance?.displayValue || 0)} ${
                       nativeSymbol || "XFI"
                     }`}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+            Epoch Information
+          </h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Epoch End</span>
+              <span className="text-white font-medium">
+                {epochInfo
+                  ? formatDate(epochInfo.epochEnd)
+                  : "Loading..."}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Epoch Length</span>
+              <span className="text-white font-medium">
+                {epochInfo
+                  ? `${Math.floor(epochInfo.epochLength / 86400)} days`
+                  : "Loading..."}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Contract Status</span>
+              <span className={`font-medium px-2 py-1 rounded text-xs ${
+                contractState?.paused 
+                  ? "bg-red-500/20 text-red-300" 
+                  : "bg-green-500/20 text-green-300"
+              }`}>
+                {contractState?.paused ? "Paused" : "Active"}
               </span>
             </div>
           </div>

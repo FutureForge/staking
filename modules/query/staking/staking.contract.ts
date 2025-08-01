@@ -251,8 +251,8 @@ export async function getEpochInfo(): Promise<{
   return {
     lastRewardTime: Number(lastRewardTime),
     epochEnd: Number(epochEnd),
-    rewardPerEpoch: Number(rewardPerEpoch),
-    nativeRewardPerEpoch: Number(nativeRewardPerEpoch),
+    rewardPerEpoch: Number(toTokens(rewardPerEpoch, 18)),
+    nativeRewardPerEpoch: Number(toEther(nativeRewardPerEpoch)),
     epochLength: Number(epochLength),
   };
 }

@@ -1,28 +1,36 @@
-import { useEpochInfo, useFeeInfo, useNextEpochTime, useTimeUntilNextEpoch } from "@/modules/query";
+import {
+  useEpochInfo,
+  useFeeInfo,
+  useNextEpochTime,
+  useTimeUntilNextEpoch,
+} from "@/modules/query";
+import { formatNumber } from "@/utils/global";
 
 export function EpochInfo() {
   const { data: epochInfo, isLoading: isEpochLoading } = useEpochInfo();
   const { data: feeInfo, isLoading: isFeeLoading } = useFeeInfo();
-  const { data: nextEpochTime, isLoading: isNextEpochLoading } = useNextEpochTime();
-  const { data: timeUntilNextEpoch, isLoading: isTimeUntilNextEpochLoading } = useTimeUntilNextEpoch();
+  const { data: nextEpochTime, isLoading: isNextEpochLoading } =
+    useNextEpochTime();
+  const { data: timeUntilNextEpoch, isLoading: isTimeUntilNextEpochLoading } =
+    useTimeUntilNextEpoch();
 
   const formatTimeUTC = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleString('en-GB', {
-      timeZone: 'UTC',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
+    return date.toLocaleString("en-GB", {
+      timeZone: "UTC",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     });
   };
 
   const formatDuration = (seconds: number) => {
     if (seconds <= 0) return "0m";
-    
+
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -137,9 +145,7 @@ export function EpochInfo() {
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
           <div className="flex items-center space-x-3 mb-4">
             <span className="text-2xl drop-shadow-lg">🚀</span>
-            <h3 className="text-lg font-semibold drop-shadow-sm">
-              Next Epoch
-            </h3>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Next Epoch</h3>
           </div>
 
           {isNextEpochLoading || isTimeUntilNextEpochLoading ? (
@@ -180,20 +186,17 @@ export function EpochInfo() {
             <div className="flex justify-between items-center">
               <span className="text-purple-200">ERC20 Rewards</span>
               <span className="text-white font-medium drop-shadow-sm">
-                {epochInfo ? formatTokenAmount(epochInfo.rewardPerEpoch) : "0"}{" "}
-                XFI
+                {epochInfo ? formatNumber(epochInfo.rewardPerEpoch) : "0"} USDT
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Native Rewards</span>
               <span className="text-white font-medium drop-shadow-sm">
-                {epochInfo
-                  ? formatTokenAmount(epochInfo.nativeRewardPerEpoch)
-                  : "0"}{" "}
+                {epochInfo ? formatNumber(epochInfo.nativeRewardPerEpoch) : "0"}{" "}
                 XFI
               </span>
             </div>
-            <div className="flex justify-between items-center">
+            {/* <div className="flex justify-between items-center">
               <span className="text-purple-200">Total Rewards</span>
               <span className="text-white font-medium drop-shadow-sm">
                 {epochInfo
@@ -203,7 +206,7 @@ export function EpochInfo() {
                   : "0"}{" "}
                 XFI
               </span>
-            </div>
+            </div> */}
           </div>
         </div>
 
