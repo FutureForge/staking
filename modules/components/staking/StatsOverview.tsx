@@ -22,10 +22,14 @@ export function StatsOverview() {
     useERC20TokenBalance();
   const { data: erc20Symbol } = useERC20TokenSymbol();
   const { data: nativeSymbol } = useNativeStakingTokenSymbol();
-  
+
   // Additional contract data
-  const { data: lastRewardTime, isLoading: isLastRewardTimeLoading } = useLastRewardTime();
-  const { data: lastNativeRewardTime, isLoading: isLastNativeRewardTimeLoading } = useLastNativeRewardTime();
+  const { data: lastRewardTime, isLoading: isLastRewardTimeLoading } =
+    useLastRewardTime();
+  const {
+    data: lastNativeRewardTime,
+    isLoading: isLastNativeRewardTimeLoading,
+  } = useLastNativeRewardTime();
   const { data: epochInfo, isLoading: isEpochInfoLoading } = useEpochInfo();
   const { data: feeInfo, isLoading: isFeeInfoLoading } = useFeeInfo();
 
@@ -54,9 +58,7 @@ export function StatsOverview() {
     },
     {
       title: "Last ERC20 Reward",
-      value: lastRewardTime
-        ? formatDate(lastRewardTime)
-        : "Never",
+      value: lastRewardTime ? formatDate(lastRewardTime) : "Never",
       unit: lastRewardTime ? formatTime(lastRewardTime) : "",
       icon: "🕒",
       color: "from-green-500 to-green-600",
@@ -65,9 +67,7 @@ export function StatsOverview() {
     },
     {
       title: "Last Native Reward",
-      value: lastNativeRewardTime
-        ? formatDate(lastNativeRewardTime)
-        : "Never",
+      value: lastNativeRewardTime ? formatDate(lastNativeRewardTime) : "Never",
       unit: lastNativeRewardTime ? formatTime(lastNativeRewardTime) : "",
       icon: "⏰",
       color: "from-orange-500 to-orange-600",
@@ -76,9 +76,7 @@ export function StatsOverview() {
     },
     {
       title: "ERC20 Reward/Epoch",
-      value: epochInfo
-        ? formatNumber(toTokens(BigInt(epochInfo.rewardPerEpoch), 18))
-        : "0",
+      value: epochInfo ? formatNumber(epochInfo.rewardPerEpoch) : "0",
       unit: "USDT",
       icon: "🎁",
       color: "from-emerald-500 to-emerald-600",
@@ -87,9 +85,7 @@ export function StatsOverview() {
     },
     {
       title: "Native Reward/Epoch",
-      value: epochInfo
-        ? formatNumber(toEther(BigInt(epochInfo.nativeRewardPerEpoch)))
-        : "0",
+      value: epochInfo ? formatNumber(epochInfo.nativeRewardPerEpoch) : "0",
       unit: "XFI",
       icon: "🎯",
       color: "from-cyan-500 to-cyan-600",
@@ -231,9 +227,7 @@ export function StatsOverview() {
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Epoch End</span>
               <span className="text-white font-medium">
-                {epochInfo
-                  ? formatDate(epochInfo.epochEnd)
-                  : "Loading..."}
+                {epochInfo ? formatDate(epochInfo.epochEnd) : "Loading..."}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -246,11 +240,13 @@ export function StatsOverview() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Contract Status</span>
-              <span className={`font-medium px-2 py-1 rounded text-xs ${
-                contractState?.paused 
-                  ? "bg-red-500/20 text-red-300" 
-                  : "bg-green-500/20 text-green-300"
-              }`}>
+              <span
+                className={`font-medium px-2 py-1 rounded text-xs ${
+                  contractState?.paused
+                    ? "bg-red-500/20 text-red-300"
+                    : "bg-green-500/20 text-green-300"
+                }`}
+              >
                 {contractState?.paused ? "Paused" : "Active"}
               </span>
             </div>
