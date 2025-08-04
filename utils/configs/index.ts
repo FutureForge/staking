@@ -63,7 +63,8 @@ export const chain1Mainnet = defineChain({
 
 export const chain1TestnetStakingContract =
   "0x1155e6977930b8C8439413e223b743Ec714D91EA";
-export const chain1MainnetStakingContract = "";
+export const chain1MainnetStakingContract =
+  "0x0CB5A8584C40B88eB3Ab132afFF7CD77fe3FC7FF";
 
 // export const chain1TestnetStakingTokenNativeContract =
 //   "0xf8fF45BCB66874F10E04834820c283d715d93a83";
