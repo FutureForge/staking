@@ -117,41 +117,41 @@ export function StatsOverview() {
   ];
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
-      <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl">
+      <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 drop-shadow-sm">
         Platform Overview
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {statsCards.map((card, index) => (
           <div
             key={index}
-            className={`bg-gradient-to-br ${card.color} hover:${card.hoverColor} rounded-xl p-4 lg:p-6 text-white relative overflow-hidden min-h-[120px] transition-all duration-300 transform hover:scale-105 hover:shadow-xl cursor-pointer`}
+            className={`bg-gradient-to-br ${card.color} hover:${card.hoverColor} rounded-xl p-3 sm:p-4 lg:p-6 text-white relative overflow-hidden min-h-[100px] sm:min-h-[120px] transition-all duration-300 transform hover:scale-105 hover:shadow-xl cursor-pointer`}
           >
             {/* Background Pattern */}
-            <div className="absolute top-0 right-0 w-16 h-16 lg:w-20 lg:h-20 opacity-10">
-              <div className="text-3xl lg:text-4xl">{card.icon}</div>
+            <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 opacity-10">
+              <div className="text-2xl sm:text-3xl lg:text-4xl">{card.icon}</div>
             </div>
 
             <div className="relative z-10">
               <div className="flex items-center space-x-2 mb-2">
-                <span className="text-xl lg:text-2xl">{card.icon}</span>
-                <h3 className="text-xs lg:text-sm font-medium text-white/80 leading-tight">
+                <span className="text-lg sm:text-xl lg:text-2xl">{card.icon}</span>
+                <h3 className="text-xs sm:text-sm font-medium text-white/80 leading-tight">
                   {card.title}
                 </h3>
               </div>
 
               {card.isLoading ? (
                 <div className="animate-pulse">
-                  <div className="h-6 lg:h-8 bg-white/20 rounded mb-1"></div>
-                  <div className="h-4 bg-white/20 rounded w-12 lg:w-16"></div>
+                  <div className="h-5 sm:h-6 lg:h-8 bg-white/20 rounded mb-1"></div>
+                  <div className="h-3 sm:h-4 bg-white/20 rounded w-12 lg:w-16"></div>
                 </div>
               ) : (
                 <>
-                  <div className="text-xl lg:text-2xl font-bold mb-1 drop-shadow-sm">
+                  <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 drop-shadow-sm">
                     {card.value}
                   </div>
-                  <div className="text-xs lg:text-sm text-white/70">
+                  <div className="text-xs sm:text-sm text-white/70">
                     {card.unit}
                   </div>
                 </>
@@ -162,15 +162,15 @@ export function StatsOverview() {
       </div>
 
       {/* Additional Stats */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+      <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
             Weight Distribution
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">ERC20 Weight</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">ERC20 Weight</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {contractState
                   ? formatNumber(
                       toTokens(BigInt(contractState.totalWeight), 18)
@@ -179,8 +179,8 @@ export function StatsOverview() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Native Weight</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">Native Weight</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {contractState
                   ? formatNumber(
                       toEther(BigInt(contractState.totalNativeWeight))
@@ -191,14 +191,14 @@ export function StatsOverview() {
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+        <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
             Wallet Balance
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">ERC20 Balance</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">ERC20 Balance</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {isERC20BalanceLoading
                   ? "Loading..."
                   : `${formatNumber(toTokens(BigInt(erc20Balance), 18))} ${
@@ -207,8 +207,8 @@ export function StatsOverview() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Native Balance</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">Native Balance</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {isNativeBalanceLoading
                   ? "Loading..."
                   : `${formatNumber(nativeBalance?.displayValue || 0)} ${
@@ -219,27 +219,27 @@ export function StatsOverview() {
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+        <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
             Epoch Information
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Epoch End</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">Epoch End</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {epochInfo ? formatDate(epochInfo.epochEnd) : "Loading..."}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Epoch Length</span>
-              <span className="text-white font-medium">
+              <span className="text-purple-200 text-sm sm:text-base">Epoch Length</span>
+              <span className="text-white font-medium text-sm sm:text-base">
                 {epochInfo
                   ? `${Math.floor(epochInfo.epochLength / 86400)} days`
                   : "Loading..."}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Contract Status</span>
+              <span className="text-purple-200 text-sm sm:text-base">Contract Status</span>
               <span
                 className={`font-medium px-2 py-1 rounded text-xs ${
                   contractState?.paused

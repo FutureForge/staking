@@ -58,7 +58,7 @@ export function Nav() {
   return (
     <nav
       className={cn(
-        "flex sticky top-0 inset-x-0 z-50 py-4 h-24 w-full md:px-14 px-4 gap-4 justify-between items-center font-inter",
+        "flex sticky top-0 inset-x-0 z-50 py-3 sm:py-4 h-20 sm:h-24 w-full md:px-14 px-4 gap-2 sm:gap-4 justify-between items-center font-inter",
         isScrolled
           ? "bg-gradient-to-r from-purple-900/95 via-indigo-900/95 to-purple-900/95 backdrop-blur-md border-b border-purple-500/20 shadow-lg"
           : "bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm"
@@ -67,17 +67,17 @@ export function Nav() {
       {/* Left Section - Dashboard Title */}
       <div className="lg:w-1/3 w-1/2 flex items-center">
         <div className="text-white">
-          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent drop-shadow-lg">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent drop-shadow-lg">
             STAKEX
           </h1>
-          <p className="text-purple-200 text-sm lg:text-base mt-1 drop-shadow-sm hidden sm:block">
+          <p className="text-purple-200 text-xs sm:text-sm lg:text-base mt-1 drop-shadow-sm hidden sm:block">
             DeFi Staking Platform for XFI
           </p>
         </div>
       </div>
 
       {/* Center Section - Navigation Links */}
-      <div className="hidden min-[1170px]:flex items-center gap-8">
+      <div className="hidden lg:flex items-center gap-8">
         {Nav_Links.map((item) => {
           const { name, link } = item;
           return (
@@ -96,7 +96,7 @@ export function Nav() {
       </div>
 
       {/* Right Section - Wallet Connection */}
-      <div className="lg:w-1/3 w-1/2 flex items-center justify-end gap-4">
+      <div className="lg:w-1/3 w-1/2 flex items-center justify-end gap-2 sm:gap-4">
         {/* Connection Status */}
         <div className="hidden md:flex items-center space-x-3 text-right">
           {account ? (
@@ -155,24 +155,24 @@ export function Nav() {
             connectButton={{
               label: "Connect Wallet",
               className:
-                "!font-inter !rounded-xl lg:!w-36 !w-[75%] max-sm:!w-full !flex !items-center !justify-center hover:!bg-purple-600 hover:!text-white !duration-300 !ease-in-out !transition !bg-gradient-to-r !from-purple-600 !to-indigo-600 !text-white !h-10 !shadow-lg hover:!shadow-purple-500/25",
+                "!font-inter !rounded-xl lg:!w-36 !w-32 sm:!w-36 !flex !items-center !justify-center hover:!bg-purple-600 hover:!text-white !duration-300 !ease-in-out !transition !bg-gradient-to-r !from-purple-600 !to-indigo-600 !text-white !h-10 !shadow-lg hover:!shadow-purple-500/25 !text-sm sm:!text-base",
             }}
           />
         )}
       </div>
 
       {/* Mobile Menu Button */}
-      <div className="min-[1170px]:hidden flex items-center gap-8">
+      <div className="lg:hidden flex items-center gap-4">
         {isMobileNavOpen ? (
           <IoClose
-            size={30}
+            size={28}
             onClick={() => setIsMobileNavOpen(false)}
-            className="text-purple-200 hover:text-white transition-colors duration-300"
+            className="text-purple-200 hover:text-white transition-colors duration-300 cursor-pointer"
           />
         ) : (
           <IoIosMenu
-            size={30}
-            className="text-purple-200 hover:text-white transition-colors duration-300"
+            size={28}
+            className="text-purple-200 hover:text-white transition-colors duration-300 cursor-pointer"
             onClick={() => setIsMobileNavOpen(true)}
           />
         )}
@@ -184,8 +184,8 @@ export function Nav() {
 
 function MobileNav() {
   return (
-    <div className="fixed top-[96px] left-0 w-full h-screen flex flex-col items-center bg-gradient-to-b from-purple-900/95 to-indigo-900/95 backdrop-blur-md text-white z-50">
-      <div className="flex flex-col items-center justify-center gap-5 mt-10">
+    <div className="fixed top-[80px] sm:top-[96px] left-0 w-full h-screen flex flex-col items-center bg-gradient-to-b from-purple-900/95 to-indigo-900/95 backdrop-blur-md text-white z-50">
+      <div className="flex flex-col items-center justify-center gap-6 mt-10">
         {Nav_Links.map((item) => {
           const { name, link } = item;
 
@@ -194,7 +194,7 @@ function MobileNav() {
               <li className="flex">
                 <Link
                   href={link}
-                  className="hover:text-purple-300 font-medium text-xl text-purple-200 transition-colors duration-300"
+                  className="hover:text-purple-300 font-medium text-xl text-purple-200 transition-colors duration-300 py-2 px-4 rounded-lg hover:bg-white/10"
                 >
                   {name}
                 </Link>

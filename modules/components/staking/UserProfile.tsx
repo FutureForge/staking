@@ -84,36 +84,36 @@ export function UserProfile() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* User Header */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-lg drop-shadow-sm">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+        <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-base sm:text-lg drop-shadow-sm">
               {userAddress.slice(2, 4).toUpperCase()}
             </span>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-bold text-white drop-shadow-sm">
+            <h2 className="text-lg sm:text-xl font-bold text-white drop-shadow-sm">
               Your Profile
             </h2>
-            <p className="text-purple-200 text-sm font-mono truncate">
+            <p className="text-purple-200 text-xs sm:text-sm font-mono truncate">
               {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
             </p>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
-            <p className="text-purple-200 text-sm">Total Positions</p>
-            <p className="text-white font-bold text-lg drop-shadow-sm">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-white/5 rounded-lg p-2 sm:p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-xs sm:text-sm">Total Positions</p>
+            <p className="text-white font-bold text-base sm:text-lg drop-shadow-sm">
               {(erc20Positions?.length || 0) + (nativePositions?.length || 0)}
             </p>
           </div>
-          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
-            <p className="text-purple-200 text-sm">Total Weight</p>
-            <p className="text-white font-bold text-lg drop-shadow-sm">
+          <div className="bg-white/5 rounded-lg p-2 sm:p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-xs sm:text-sm">Total Weight</p>
+            <p className="text-white font-bold text-base sm:text-lg drop-shadow-sm">
               {formatNumber(
                 (userInfoERC20?.weight || 0) + (userInfoNative?.weight || 0)
               )}
@@ -122,18 +122,18 @@ export function UserProfile() {
         </div>
 
         {/* Bond Token Stats */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
-            <p className="text-purple-200 text-sm">STOKEN Balance</p>
-            <p className="text-white font-bold text-lg drop-shadow-sm">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
+          <div className="bg-white/5 rounded-lg p-2 sm:p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-xs sm:text-sm">STOKEN Balance</p>
+            <p className="text-white font-bold text-base sm:text-lg drop-shadow-sm">
               {bondTokenBalances
                 ? formatNumber(bondTokenBalances.stokenBalance)
                 : "0"}
             </p>
           </div>
-          <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors duration-300">
-            <p className="text-purple-200 text-sm">SNATIVE Balance</p>
-            <p className="text-white font-bold text-lg drop-shadow-sm">
+          <div className="bg-white/5 rounded-lg p-2 sm:p-3 hover:bg-white/10 transition-colors duration-300">
+            <p className="text-purple-200 text-xs sm:text-sm">SNATIVE Balance</p>
+            <p className="text-white font-bold text-base sm:text-lg drop-shadow-sm">
               {bondTokenBalances
                 ? formatNumber(bondTokenBalances.snativeBalance)
                 : "0"}
@@ -143,24 +143,24 @@ export function UserProfile() {
       </div>
 
       {/* Pending Rewards */}
-      <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-2xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="text-2xl drop-shadow-lg">🎁</span>
-          <h3 className="text-lg font-semibold drop-shadow-sm">
+      <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 sm:p-6 text-white shadow-2xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
+        <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+          <span className="text-xl sm:text-2xl drop-shadow-lg">🎁</span>
+          <h3 className="text-base sm:text-lg font-semibold drop-shadow-sm">
             Pending Rewards
           </h3>
         </div>
 
         {isRewardsLoading ? (
-          <div className="animate-pulse space-y-3">
-            <div className="h-8 bg-white/20 rounded"></div>
-            <div className="h-6 bg-white/20 rounded w-3/4"></div>
+          <div className="animate-pulse space-y-2 sm:space-y-3">
+            <div className="h-6 sm:h-8 bg-white/20 rounded"></div>
+            <div className="h-4 sm:h-6 bg-white/20 rounded w-3/4"></div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-green-100">ERC20 Rewards</span>
-              <span className="font-bold text-lg drop-shadow-sm">
+              <span className="text-green-100 text-sm sm:text-base">ERC20 Rewards</span>
+              <span className="font-bold text-base sm:text-lg drop-shadow-sm">
                 {pendingRewards
                   ? Number(
                       toTokens(BigInt(pendingRewards.erc20Rewards), 18)
@@ -170,8 +170,8 @@ export function UserProfile() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-green-100">Native Rewards</span>
-              <span className="font-bold text-lg drop-shadow-sm">
+              <span className="text-green-100 text-sm sm:text-base">Native Rewards</span>
+              <span className="font-bold text-base sm:text-lg drop-shadow-sm">
                 {pendingRewards
                   ? Number(
                       toEther(BigInt(pendingRewards.nativeRewards))
@@ -199,24 +199,24 @@ export function UserProfile() {
       </div>
 
       {/* Bond Token Balances */}
-      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white shadow-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="text-2xl drop-shadow-lg">🏦</span>
-          <h3 className="text-lg font-semibold drop-shadow-sm">
+      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-4 sm:p-6 text-white shadow-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+        <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+          <span className="text-xl sm:text-2xl drop-shadow-lg">🏦</span>
+          <h3 className="text-base sm:text-lg font-semibold drop-shadow-sm">
             Bond Token Balances
           </h3>
         </div>
 
         {isBondTokenBalancesLoading ? (
-          <div className="animate-pulse space-y-3">
-            <div className="h-8 bg-white/20 rounded"></div>
-            <div className="h-6 bg-white/20 rounded w-3/4"></div>
+          <div className="animate-pulse space-y-2 sm:space-y-3">
+            <div className="h-6 sm:h-8 bg-white/20 rounded"></div>
+            <div className="h-4 sm:h-6 bg-white/20 rounded w-3/4"></div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-blue-100">STOKEN Balance</span>
-              <span className="font-bold text-lg drop-shadow-sm">
+              <span className="text-blue-100 text-sm sm:text-base">STOKEN Balance</span>
+              <span className="font-bold text-base sm:text-lg drop-shadow-sm">
                 {bondTokenBalances
                   ? formatNumber(bondTokenBalances.stokenBalance)
                   : "0"}{" "}
@@ -224,15 +224,15 @@ export function UserProfile() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-blue-100">SNATIVE Balance</span>
-              <span className="font-bold text-lg drop-shadow-sm">
+              <span className="text-blue-100 text-sm sm:text-base">SNATIVE Balance</span>
+              <span className="font-bold text-base sm:text-lg drop-shadow-sm">
                 {bondTokenBalances
                   ? formatNumber(bondTokenBalances.snativeBalance)
                   : "0"}{" "}
                 SNATIVE
               </span>
             </div>
-            <div className="border-t border-blue-400/30 pt-3 mt-3">
+            <div className="border-t border-blue-400/30 pt-2 sm:pt-3 mt-2 sm:mt-3">
               <div className="flex justify-between items-center">
                 {/* <span className="text-blue-100 font-semibold">
                   Total Bond Tokens
@@ -253,29 +253,29 @@ export function UserProfile() {
       </div>
 
       {/* Position Summary */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
-        <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
           Position Summary
         </h3>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* ERC20 Positions */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-purple-200 font-medium">
+              <span className="text-purple-200 font-medium text-sm sm:text-base">
                 ERC20 Positions
               </span>
-              <span className="text-white font-bold drop-shadow-sm">
+              <span className="text-white font-bold drop-shadow-sm text-sm sm:text-base">
                 {erc20Positions?.length || 0}
               </span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-purple-200">Weight</span>
               <span className="text-white">
                 {formatNumber(userInfoERC20?.weight || 0)}
               </span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-purple-200">Reward Debt</span>
               <span className="text-white">
                 {formatNumber(userInfoERC20?.rewardDebt || 0)}
@@ -284,22 +284,22 @@ export function UserProfile() {
           </div>
 
           {/* Native Positions */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+          <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 hover:bg-white/10 transition-colors duration-300">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-purple-200 font-medium">
+              <span className="text-purple-200 font-medium text-sm sm:text-base">
                 Native Positions
               </span>
-              <span className="text-white font-bold drop-shadow-sm">
+              <span className="text-white font-bold drop-shadow-sm text-sm sm:text-base">
                 {nativePositions?.length || 0}
               </span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-purple-200">Weight</span>
               <span className="text-white">
                 {formatNumber(userInfoNative?.weight || 0)}
               </span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-purple-200">Reward Debt</span>
               <span className="text-white">
                 {formatNumber(userInfoNative?.rewardDebt || 0)}
@@ -310,21 +310,21 @@ export function UserProfile() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
-        <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
           Quick Actions
         </h3>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           <button
             onClick={() => setIsERC20ModalOpen(true)}
-            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
           >
             Stake ERC20 Tokens
           </button>
           <button
             onClick={() => setIsNativeModalOpen(true)}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
           >
             Stake Native Tokens
           </button>
@@ -334,7 +334,7 @@ export function UserProfile() {
               (erc20Positions?.length || 0) + (nativePositions?.length || 0) ===
               0
             }
-            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+            className={`w-full font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base ${
               (erc20Positions?.length || 0) + (nativePositions?.length || 0) > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
                 : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
@@ -345,7 +345,7 @@ export function UserProfile() {
           <button
             onClick={() => claimERC20Mutation.mutate()}
             disabled={!hasERC20RewardsToClaim || isClaimingERC20}
-            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+            className={`w-full font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base ${
               hasERC20RewardsToClaim && !isClaimingERC20
                 ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
                 : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
@@ -356,7 +356,7 @@ export function UserProfile() {
           <button
             onClick={() => claimNativeMutation.mutate()}
             disabled={!hasNativeRewardsToClaim || isClaimingNative}
-            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+            className={`w-full font-medium py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base ${
               hasNativeRewardsToClaim && !isClaimingNative
                 ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
                 : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
@@ -368,17 +368,17 @@ export function UserProfile() {
       </div>
 
       {/* Network Status */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl hover:bg-white/10 transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
-            <span className="text-white font-medium drop-shadow-sm">
+            <span className="text-white font-medium drop-shadow-sm text-sm sm:text-base">
               Network Status
             </span>
           </div>
-          <span className="text-green-400 text-sm font-medium">Connected</span>
+          <span className="text-green-400 text-xs sm:text-sm font-medium">Connected</span>
         </div>
-        <p className="text-purple-200 text-sm mt-2">
+        <p className="text-purple-200 text-xs sm:text-sm mt-2">
           CrossFi {IS_TESTNET ? "Testnet" : "Mainnet"} • All systems operational
         </p>
       </div>

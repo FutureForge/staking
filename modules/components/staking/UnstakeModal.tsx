@@ -124,9 +124,9 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
       ></div>
 
       {/* Modal */}
-      <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white drop-shadow-sm">
+      <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden mx-4">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-sm">
             Unstake Positions
           </h2>
           <button
@@ -135,7 +135,7 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
             aria-label="Close modal"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 sm:w-6 sm:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -150,20 +150,20 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
           </button>
         </div>
 
-        <div className="space-y-6 max-h-[60vh] overflow-y-auto">
+        <div className="space-y-4 sm:space-y-6 max-h-[60vh] overflow-y-auto">
           {/* ERC20 Positions */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
               ERC20 Positions ({erc20Positions?.length || 0})
             </h3>
             {isERC20Loading ? (
-              <div className="animate-pulse space-y-3">
+              <div className="animate-pulse space-y-2 sm:space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-white/10 rounded-lg"></div>
+                  <div key={i} className="h-16 sm:h-20 bg-white/10 rounded-lg"></div>
                 ))}
               </div>
             ) : erc20Positions && erc20Positions.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {erc20Positions.map((positionId) => (
                   <PositionCard
                     key={`erc20-${positionId}`}
@@ -179,10 +179,10 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-white/70">
-                <div className="text-4xl mb-2">📭</div>
-                <p>No ERC20 positions found</p>
-                <p className="text-sm mt-2">
+              <div className="text-center py-6 sm:py-8 text-white/70">
+                <div className="text-3xl sm:text-4xl mb-2">📭</div>
+                <p className="text-sm sm:text-base">No ERC20 positions found</p>
+                <p className="text-xs sm:text-sm mt-2">
                   You haven't staked any ERC20 tokens yet
                 </p>
               </div>
@@ -191,17 +191,17 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
 
           {/* Native Positions */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
               Native Positions ({nativePositions?.length || 0})
             </h3>
             {isNativeLoading ? (
-              <div className="animate-pulse space-y-3">
+              <div className="animate-pulse space-y-2 sm:space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-white/10 rounded-lg"></div>
+                  <div key={i} className="h-16 sm:h-20 bg-white/10 rounded-lg"></div>
                 ))}
               </div>
             ) : nativePositions && nativePositions.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {nativePositions.map((positionId) => (
                   <PositionCard
                     key={`native-${positionId}`}
@@ -217,10 +217,10 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-white/70">
-                <div className="text-4xl mb-2">📭</div>
-                <p>No native positions found</p>
-                <p className="text-sm mt-2">
+              <div className="text-center py-6 sm:py-8 text-white/70">
+                <div className="text-3xl sm:text-4xl mb-2">📭</div>
+                <p className="text-sm sm:text-base">No native positions found</p>
+                <p className="text-xs sm:text-sm mt-2">
                   You haven't staked any native tokens yet
                 </p>
               </div>
@@ -229,10 +229,10 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-white/20">
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/20">
           <button
             onClick={handleClose}
-            className="px-6 py-2 text-white/70 hover:text-white transition-colors"
+            className="px-4 sm:px-6 py-2 text-white/70 hover:text-white transition-colors text-sm sm:text-base"
           >
             Cancel
           </button>
@@ -244,7 +244,7 @@ export function UnstakeModal({ isOpen, onClose }: UnstakeModalProps) {
               emergencyWithdrawMutation.isPending || 
               emergencyWithdrawNativeMutation.isPending
             }
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
               selectedPosition && 
               !unstakeMutation.isPending && 
               !emergencyWithdrawMutation.isPending && 
@@ -298,17 +298,17 @@ function PositionCard({
 
   if (isLoading) {
     return (
-      <div className="animate-pulse bg-white/10 rounded-lg p-4">
-        <div className="h-4 bg-white/20 rounded mb-2"></div>
-        <div className="h-3 bg-white/20 rounded w-3/4"></div>
+      <div className="animate-pulse bg-white/10 rounded-lg p-3 sm:p-4">
+        <div className="h-3 sm:h-4 bg-white/20 rounded mb-2"></div>
+        <div className="h-2 sm:h-3 bg-white/20 rounded w-3/4"></div>
       </div>
     );
   }
 
   if (isError || !position) {
     return (
-      <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-        <p className="text-red-300 text-sm">
+      <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 sm:p-4">
+        <p className="text-red-300 text-xs sm:text-sm">
           {isError
             ? `Error loading position ${positionId}`
             : `Position ${positionId} not found`}
@@ -332,17 +332,17 @@ function PositionCard({
 
   return (
     <div
-      className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+      className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition-all duration-200 ${
         isSelected
           ? "border-red-400 bg-red-500/20 shadow-lg"
           : "border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30"
       }`}
       onClick={() => onSelect(positionWithDetails)}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center space-x-2">
-          <span className="text-lg">{type === "erc20" ? "💰" : "⚡"}</span>
-          <span className="font-semibold text-white">
+          <span className="text-base sm:text-lg">{type === "erc20" ? "💰" : "⚡"}</span>
+          <span className="font-semibold text-white text-sm sm:text-base">
             Position #{positionId}
           </span>
           <span
@@ -366,7 +366,7 @@ function PositionCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
         <div>
           <p className="text-white/70">Amount</p>
           <p className="text-white font-medium">{position.amount} XFI</p>
@@ -395,13 +395,13 @@ function PositionCard({
       </div>
 
       {!isUnlocked && position.plan !== "DYNAMIC" && (
-        <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-300">
+        <div className="mt-2 sm:mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-300">
           ⚠️ This position is still locked. Early unstaking may incur penalties.
         </div>
       )}
       
       {isUnlocked && position.plan === "FIXED" && (
-        <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded text-xs text-green-300">
+        <div className="mt-2 sm:mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded text-xs text-green-300">
           ✅ This position is now unlocked and ready for withdrawal.
         </div>
       )}

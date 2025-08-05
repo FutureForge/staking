@@ -22,10 +22,10 @@ export function StakingDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Column - Stats Overview */}
-          <div className="xl:col-span-3 space-y-8">
+          <div className="xl:col-span-3 space-y-4 sm:space-y-6 lg:space-y-8">
             <StatsOverview />
             <EpochInfo />
           </div>

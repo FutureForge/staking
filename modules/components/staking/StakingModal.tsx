@@ -134,18 +134,18 @@ export function StakingModal({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onClose}
           />
-          <div className="relative bg-gradient-to-br from-purple-900/95 to-indigo-900/95 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-md mx-4 p-6">
+          <div className="relative bg-gradient-to-br from-purple-900/95 to-indigo-900/95 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-md mx-4 p-4 sm:p-6">
             <div className="text-center">
-              <div className="text-4xl mb-4">⚠️</div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">⚠️</div>
+              <h3 className="text-base sm:text-lg font-bold text-white mb-2">
                 Something went wrong
               </h3>
-              <p className="text-purple-200 mb-4">
+              <p className="text-purple-200 mb-3 sm:mb-4 text-sm sm:text-base">
                 Please try again or close the modal.
               </p>
               <button
                 onClick={onClose}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
               >
                 Close
               </button>
@@ -164,8 +164,8 @@ export function StakingModal({
         {/* Modal */}
         <div className="relative bg-gradient-to-br from-purple-900/95 to-indigo-900/95 backdrop-blur-md rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-md mx-4 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-purple-500/20">
-            <h2 className="text-xl font-bold text-white">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-purple-500/20">
+            <h2 className="text-lg sm:text-xl font-bold text-white">
               Stake {stakeType === "native" ? "Native" : "ERC20"} {tokenSymbol}
             </h2>
             <button
@@ -173,19 +173,19 @@ export function StakingModal({
               className="text-purple-300 hover:text-white transition-colors duration-300"
               aria-label="Close modal"
             >
-              <IoClose size={24} />
+              <IoClose size={20} className="sm:w-6 sm:h-6" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {/* Balance Display */}
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10">
               <div className="flex justify-between items-center">
-                <span className="text-purple-200 text-sm">
+                <span className="text-purple-200 text-xs sm:text-sm">
                   Available Balance
                 </span>
-                <span className="text-white font-semibold">
+                <span className="text-white font-semibold text-sm sm:text-base">
                   {isLoading ? "Loading..." : `${userBalance} ${tokenSymbol}`}
                 </span>
               </div>
@@ -193,7 +193,7 @@ export function StakingModal({
 
             {/* Amount Input */}
             <div className="space-y-2">
-              <label className="text-purple-200 text-sm font-medium">
+              <label className="text-purple-200 text-xs sm:text-sm font-medium">
                 Amount to Stake
               </label>
               <div className="relative">
@@ -202,12 +202,12 @@ export function StakingModal({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.0"
-                  className="w-full bg-white/5 border border-purple-500/30 rounded-lg px-4 py-3 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                  className="w-full bg-white/5 border border-purple-500/30 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm sm:text-base"
                   disabled={isProcessing}
                 />
                 <button
                   onClick={handleMaxAmount}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors duration-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-300 text-xs sm:text-sm font-medium transition-colors duration-300"
                   disabled={isProcessing}
                 >
                   MAX
@@ -216,17 +216,17 @@ export function StakingModal({
             </div>
 
             {/* Duration Selection */}
-            <div className="space-y-3">
-              <label className="text-purple-200 text-sm font-medium">
+            <div className="space-y-2 sm:space-y-3">
+              <label className="text-purple-200 text-xs sm:text-sm font-medium">
                 Staking Duration
               </label>
-              <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+              <div className="grid grid-cols-1 gap-2 max-h-40 sm:max-h-48 overflow-y-auto">
                 {durationOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => setSelectedDuration(option.value)}
                     className={cn(
-                      "text-left p-3 rounded-lg border transition-all duration-300",
+                      "text-left p-2 sm:p-3 rounded-lg border transition-all duration-300",
                       selectedDuration === option.value
                         ? "bg-purple-500/20 border-purple-500 text-white"
                         : "bg-white/5 border-white/10 text-purple-200 hover:bg-white/10 hover:border-purple-500/30"
@@ -235,12 +235,12 @@ export function StakingModal({
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="font-medium">{option.label}</div>
+                        <div className="font-medium text-sm sm:text-base">{option.label}</div>
                         <div className="text-xs opacity-75">
                           {option.description}
                         </div>
                       </div>
-                      <div className="text-sm font-semibold text-purple-300">
+                      <div className="text-xs sm:text-sm font-semibold text-purple-300">
                         {option.multiplier}
                       </div>
                     </div>
@@ -250,7 +250,7 @@ export function StakingModal({
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-4">
+            <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4">
               <button
                 onClick={handleStake}
                 disabled={
@@ -261,7 +261,7 @@ export function StakingModal({
                   stakeMutation.isPending
                 }
                 className={cn(
-                  "w-full py-3 px-4 rounded-lg font-medium transition-all duration-300",
+                  "w-full py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-300 text-sm sm:text-base",
                   !amount ||
                     parseFloat(amount) <= 0 ||
                     hasInsufficientBalance ||
@@ -280,7 +280,7 @@ export function StakingModal({
 
               <button
                 onClick={onClose}
-                className="w-full py-3 px-4 rounded-lg font-medium bg-white/5 border border-white/10 text-purple-200 hover:bg-white/10 transition-all duration-300"
+                className="w-full py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium bg-white/5 border border-white/10 text-purple-200 hover:bg-white/10 transition-all duration-300 text-sm sm:text-base"
                 disabled={isProcessing}
               >
                 Cancel

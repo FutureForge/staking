@@ -60,46 +60,46 @@ export function EpochInfo() {
   const epochProgress = getEpochProgress();
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
-      <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl">
+      <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 drop-shadow-sm">
         Epoch Information
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Current Epoch */}
-        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl drop-shadow-lg">⏰</span>
-            <h3 className="text-lg font-semibold drop-shadow-sm">
+        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-4 sm:p-6 text-white shadow-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105">
+          <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl drop-shadow-lg">⏰</span>
+            <h3 className="text-base sm:text-lg font-semibold drop-shadow-sm">
               Current Epoch
             </h3>
           </div>
 
           {isEpochLoading ? (
-            <div className="animate-pulse space-y-3">
-              <div className="h-6 bg-white/20 rounded"></div>
-              <div className="h-4 bg-white/20 rounded w-3/4"></div>
-              <div className="h-4 bg-white/20 rounded w-1/2"></div>
+            <div className="animate-pulse space-y-2 sm:space-y-3">
+              <div className="h-5 sm:h-6 bg-white/20 rounded"></div>
+              <div className="h-3 sm:h-4 bg-white/20 rounded w-3/4"></div>
+              <div className="h-3 sm:h-4 bg-white/20 rounded w-1/2"></div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div>
-                <p className="text-sm text-indigo-100">Start Time</p>
-                <p className="font-medium text-sm drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-indigo-100">Start Time</p>
+                <p className="font-medium text-xs sm:text-sm drop-shadow-sm">
                   {epochInfo
                     ? formatTimeUTC(epochInfo.epochEnd - epochInfo.epochLength)
                     : "Loading..."}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-indigo-100">End Time</p>
-                <p className="font-medium text-sm drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-indigo-100">End Time</p>
+                <p className="font-medium text-xs sm:text-sm drop-shadow-sm">
                   {epochInfo ? formatTimeUTC(epochInfo.epochEnd) : "Loading..."}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-indigo-100">Duration</p>
-                <p className="font-medium text-sm drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-indigo-100">Duration</p>
+                <p className="font-medium text-xs sm:text-sm drop-shadow-sm">
                   {epochInfo
                     ? formatDuration(epochInfo.epochLength)
                     : "Loading..."}
@@ -110,27 +110,27 @@ export function EpochInfo() {
         </div>
 
         {/* Current Epoch Countdown */}
-        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white shadow-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl drop-shadow-lg">🔥</span>
-            <h3 className="text-lg font-semibold drop-shadow-sm">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 sm:p-6 text-white shadow-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
+          <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl drop-shadow-lg">🔥</span>
+            <h3 className="text-base sm:text-lg font-semibold drop-shadow-sm">
               Time Remaining
             </h3>
           </div>
 
           {isEpochLoading ? (
             <div className="animate-pulse">
-              <div className="h-12 bg-white/20 rounded mb-2"></div>
-              <div className="h-4 bg-white/20 rounded w-2/3"></div>
+              <div className="h-10 sm:h-12 bg-white/20 rounded mb-2"></div>
+              <div className="h-3 sm:h-4 bg-white/20 rounded w-2/3"></div>
             </div>
           ) : (
             <div>
-              <div className="text-3xl font-bold mb-2 drop-shadow-lg">
+              <div className="text-2xl sm:text-3xl font-bold mb-2 drop-shadow-lg">
                 {timeUntilEpochEnd !== null
                   ? formatDuration(timeUntilEpochEnd)
                   : "Loading..."}
               </div>
-              <p className="text-red-100 text-sm drop-shadow-sm">
+              <p className="text-red-100 text-xs sm:text-sm drop-shadow-sm">
                 Until current epoch ends
               </p>
             </div>
@@ -138,30 +138,30 @@ export function EpochInfo() {
         </div>
 
         {/* Next Epoch Info */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl drop-shadow-lg">🚀</span>
-            <h3 className="text-lg font-semibold drop-shadow-sm">Next Epoch</h3>
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 sm:p-6 text-white shadow-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
+          <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl drop-shadow-lg">🚀</span>
+            <h3 className="text-base sm:text-lg font-semibold drop-shadow-sm">Next Epoch</h3>
           </div>
 
           {isNextEpochLoading || isTimeUntilNextEpochLoading ? (
-            <div className="animate-pulse space-y-3">
-              <div className="h-6 bg-white/20 rounded"></div>
-              <div className="h-4 bg-white/20 rounded w-3/4"></div>
+            <div className="animate-pulse space-y-2 sm:space-y-3">
+              <div className="h-5 sm:h-6 bg-white/20 rounded"></div>
+              <div className="h-3 sm:h-4 bg-white/20 rounded w-3/4"></div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div>
-                <p className="text-sm text-green-100">Start Time</p>
-                <p className="font-medium text-sm drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-green-100">Start Time</p>
+                <p className="font-medium text-xs sm:text-sm drop-shadow-sm">
                   {nextEpochTime
                     ? formatTimeUTC(Math.floor(nextEpochTime.getTime() / 1000))
                     : "Loading..."}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-green-100">Time Until Start</p>
-                <p className="font-medium text-sm drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-green-100">Time Until Start</p>
+                <p className="font-medium text-xs sm:text-sm drop-shadow-sm">
                   {timeUntilNextEpoch !== undefined
                     ? formatDuration(timeUntilNextEpoch)
                     : "Loading..."}
@@ -173,21 +173,21 @@ export function EpochInfo() {
       </div>
 
       {/* Rewards Information */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+      <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
             Reward Distribution
           </h3>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">ERC20 Rewards</span>
-              <span className="text-white font-medium drop-shadow-sm">
+              <span className="text-purple-200 text-sm sm:text-base">ERC20 Rewards</span>
+              <span className="text-white font-medium text-sm sm:text-base drop-shadow-sm">
                 {epochInfo ? formatNumber(epochInfo.rewardPerEpoch) : "0"} USDT
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Native Rewards</span>
-              <span className="text-white font-medium drop-shadow-sm">
+              <span className="text-purple-200 text-sm sm:text-base">Native Rewards</span>
+              <span className="text-white font-medium text-sm sm:text-base drop-shadow-sm">
                 {epochInfo ? formatNumber(epochInfo.nativeRewardPerEpoch) : "0"}{" "}
                 XFI
               </span>
@@ -206,26 +206,26 @@ export function EpochInfo() {
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
-          <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
+        <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:bg-white/10 transition-colors duration-300 shadow-xl">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 drop-shadow-sm">
             Fee Structure
           </h3>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Dynamic Fee</span>
-              <span className="text-white font-medium drop-shadow-sm">
+              <span className="text-purple-200 text-sm sm:text-base">Dynamic Fee</span>
+              <span className="text-white font-medium text-sm sm:text-base drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeDynamic / 100).toFixed(2) : "0"}%
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Fixed Fee</span>
-              <span className="text-white font-medium drop-shadow-sm">
+              <span className="text-purple-200 text-sm sm:text-base">Fixed Fee</span>
+              <span className="text-white font-medium text-sm sm:text-base drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeFixed / 100).toFixed(2) : "0"}%
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Early Unstake</span>
-              <span className="text-white font-medium drop-shadow-sm">
+              <span className="text-purple-200 text-sm sm:text-base">Early Unstake</span>
+              <span className="text-white font-medium text-sm sm:text-base drop-shadow-sm">
                 {feeInfo ? (feeInfo.feeFixedEarly / 100).toFixed(2) : "0"}%
               </span>
             </div>
@@ -235,12 +235,12 @@ export function EpochInfo() {
 
       {/* Progress Bar */}
       {epochInfo && (
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-purple-200 drop-shadow-sm">
+            <span className="text-xs sm:text-sm text-purple-200 drop-shadow-sm">
               Current Epoch Progress
             </span>
-            <span className="text-sm text-white drop-shadow-sm">
+            <span className="text-xs sm:text-sm text-white drop-shadow-sm">
               {Math.floor(epochProgress)}%
             </span>
           </div>
